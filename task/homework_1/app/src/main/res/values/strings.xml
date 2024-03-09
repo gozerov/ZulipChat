@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TFS_spring_2024</string>
+    <string name="main_activity">MainActivity</string>
+</resources>
