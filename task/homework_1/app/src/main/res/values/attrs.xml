@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="EmojiView">
+        <attr name="count" format="integer"/>
+        <attr name="android:textSize" format="dimension"/>
+    </declare-styleable>
+    <declare-styleable name="FlexBoxLayout">
+        <attr name="innerPadding" format="dimension"/>
+    </declare-styleable>
+    <declare-styleable name="CharCardLayout">
+        <attr name="android:background" format="reference"/>
+    </declare-styleable>
+</resources>

@@ -1,16 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:orientation="vertical"
-    android:gravity="center">
+    android:background="#FFE0E0E0">
 
-    <TextView
+    <ru.gozerov.tfs_spring.ChatCardLayout
+        android:background="@drawable/char_card_bg"
+        android:id="@+id/chatCardLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="64dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        android:id="@+id/setAvatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/main_activity"/>
+        android:layout_marginTop="24dp"
+        android:text="Set Avatar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chatCardLayout"/>
 
-</LinearLayout>
+    <EditText
+        android:id="@+id/nameInputField"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/setName"
+        app:layout_constraintBottom_toBottomOf="@id/setName"/>
+
+    <Button
+        android:id="@+id/setName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Set Name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setAvatar"/>
+
+    <EditText
+        android:id="@+id/messageInputField"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/setMessage"
+        app:layout_constraintBottom_toBottomOf="@id/setMessage"
+        android:layout_marginTop="24dp"/>
+
+    <Button
+        android:id="@+id/setMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Set Message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setName"/>
+
+    <Button
+        android:id="@+id/addEmoji"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Add Emoji"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setMessage"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
