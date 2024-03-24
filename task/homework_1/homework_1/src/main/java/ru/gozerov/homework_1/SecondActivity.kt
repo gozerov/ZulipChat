@@ -17,11 +17,9 @@ class SecondActivity : AppCompatActivity() {
     private val receiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == MY_ACTION) {
-                val data = Intent().putExtra(ARG_CONTACTS, intent.getStringArrayExtra(ARG_CONTACTS))
-                setResult(RESULT_OK, data)
-                finish()
-            }
+            val data = Intent().putExtra(ARG_CONTACTS, intent?.getStringArrayExtra(ARG_CONTACTS))
+            setResult(RESULT_OK, data)
+            finish()
         }
 
     }

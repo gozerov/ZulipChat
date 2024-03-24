@@ -9,7 +9,6 @@ import ru.gozerov.homework_1.SecondActivity.Companion.ARG_CONTACTS
 class MyService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val contentResolver = contentResolver
         val data = mutableListOf<String>()
         val cursor =
             contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null)
