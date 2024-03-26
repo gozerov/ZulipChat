@@ -1,11 +1,11 @@
 package ru.gozerov.tfs_spring
 
 import android.content.Context
-import android.graphics.Color
 import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.withStyledAttributes
+import ru.gozerov.tfs_spring.screens.chat.adapters.message.Reaction
 import ru.gozerov.tfs_spring.utils.dp
 
 class FlexBoxLayout @JvmOverloads constructor(
@@ -21,8 +21,9 @@ class FlexBoxLayout @JvmOverloads constructor(
     private val emojiHorizontalPadding = 12f.dp(context).toInt()
     private val emojiVerticalPadding = 8f.dp(context).toInt()
 
-    private val addButtonPadding = 2f.dp(context).toInt()
-    private val addButtonSize = 28f.dp(context).toInt()
+    private val addButtonPadding = 4f.dp(context).toInt()
+    private val addButtonWidth = 42f.dp(context).toInt()
+    private val addButtonHeight = 28f.dp(context).toInt()
 
     var onEmojiChangedListener: ((view: EmojiView) -> Unit)? = null
 
@@ -35,9 +36,14 @@ class FlexBoxLayout @JvmOverloads constructor(
     init {
         val addButton = ImageView(context)
         addButton.setImageResource(R.drawable.ic_add_24)
-        addButton.layoutParams = MarginLayoutParams(addButtonSize, addButtonSize)
-        addButton.setPadding(addButtonPadding, addButtonPadding, addButtonPadding, addButtonPadding)
-        addButton.setBackgroundColor(Color.WHITE)
+        addButton.layoutParams = MarginLayoutParams(addButtonWidth, addButtonHeight)
+        addButton.setPadding(
+            addButtonPadding,
+            addButtonPadding,
+            addButtonPadding,
+            addButtonPadding
+        )
+        addButton.setBackgroundResource(R.drawable.add_bg)
 
         context.withStyledAttributes(attributeSet, R.styleable.FlexBoxLayout) {
             innerMargin =
@@ -81,7 +87,10 @@ class FlexBoxLayout @JvmOverloads constructor(
         val actualHeight = if (lineCount > 1) {
             lineCount * (cellHeight + innerMargin) + bottomMargin
         } else {
-            cellHeight + innerMargin + bottomMargin
+            if (firstEmoji != null)
+                cellHeight + innerMargin + bottomMargin
+            else
+                0
         } + paddingTop + paddingBottom
 
         setMeasuredDimension(actualWidth, actualHeight)
@@ -107,28 +116,31 @@ class FlexBoxLayout @JvmOverloads constructor(
             view.layout(viewStart, viewTop, viewEnd, viewBottom)
             start = viewEnd
         }
-
-        val addButton = this.addButton
-        start += if (firstEmoji != null) innerMargin else 0
-        if (start + addButton.measuredWidth > width) {
-            start = paddingStart
-            top = bottom + innerMargin
-            bottom = top + addButton.measuredHeight
+        if (firstEmoji != null) {
+            val addButton = this.addButton
+            start += innerMargin
+            if (start + addButton.measuredWidth > width) {
+                start = paddingStart
+                top = bottom + innerMargin
+                bottom = top + addButton.measuredHeight
+            }
+            val addStart = start
+            val addEnd = addStart + addButton.measuredWidth
+            addButton.layout(addStart, top, addEnd, bottom)
         }
-        val addStart = start
-        val addEnd = addStart + addButton.measuredWidth
-        addButton.layout(addStart, top, addEnd, bottom)
     }
 
     override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {
         return MarginLayoutParams(context, attrs)
     }
 
-    fun addEmoji(emoji: Emoji) {
+    fun addEmoji(reaction: Reaction) {
         val emojiView = EmojiView(context)
-        emojiView.count = emoji.count
-        emojiView.emoji = emoji.emoji
-        emojiView.isEmojiSelected = emoji.isSelected
+        addView(emojiView)
+
+        emojiView.count = reaction.count
+        emojiView.emoji = reaction.emojiCode
+        emojiView.isEmojiSelected = reaction.isSelected
         emojiView.setPadding(
             emojiHorizontalPadding,
             emojiVerticalPadding,
@@ -136,11 +148,10 @@ class FlexBoxLayout @JvmOverloads constructor(
             emojiVerticalPadding
         )
         emojiView.onEmojiChangedListener = { view ->
-            onEmojiChangedListener?.invoke(view)
             removeEmojiView(view)
+            onEmojiChangedListener?.invoke(view)
         }
         emojiView.setBackgroundResource(R.drawable.emoji_bg)
-        addView(emojiView)
         emojiView.id = childCount
     }
 
@@ -153,13 +164,7 @@ class FlexBoxLayout @JvmOverloads constructor(
     private fun removeEmojiView(view: EmojiView) {
         if (view.count == 0) {
             removeView(view)
-            requestLayout()
         }
-    }
-
-    override fun onDetachedFromWindow() {
-        onEmojiChangedListener = null
-        super.onDetachedFromWindow()
     }
 
     companion object {

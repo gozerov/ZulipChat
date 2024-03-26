@@ -1,9 +1,12 @@
 package ru.gozerov.tfs_spring
 
 import android.content.Context
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -12,9 +15,10 @@ import androidx.core.content.withStyledAttributes
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.core.view.updateLayoutParams
+import ru.gozerov.tfs_spring.screens.chat.adapters.message.Reaction
 import ru.gozerov.tfs_spring.utils.dp
 
-class ChatCardLayout @JvmOverloads constructor(
+class MessageCardLayout @JvmOverloads constructor(
     context: Context,
     attributeSet: AttributeSet? = null,
     defStyle: Int = 0,
@@ -32,7 +36,6 @@ class ChatCardLayout @JvmOverloads constructor(
 
     private val messageTextView: TextView
         get() = getChildAt(3) as TextView
-
     private val emojiLayout: FlexBoxLayout
         get() = getChildAt(4) as FlexBoxLayout
 
@@ -42,6 +45,7 @@ class ChatCardLayout @JvmOverloads constructor(
                 field = value
                 nameTextView.text = field
                 requestLayout()
+                invalidate()
             }
         }
 
@@ -51,6 +55,7 @@ class ChatCardLayout @JvmOverloads constructor(
                 field = value
                 messageTextView.text = field
                 requestLayout()
+                invalidate()
             }
         }
 
@@ -60,23 +65,30 @@ class ChatCardLayout @JvmOverloads constructor(
                 field = value
                 dateTextView.text = field
                 requestLayout()
+                invalidate()
             }
         }
 
-    private val imageSize = 72f.dp(context).toInt()
+    private val imageSize = 40f.dp(context).toInt()
     private val defaultMargin = 8f.dp(context).toInt()
+    private val backgroundPaint = Paint().apply {
+        style = Paint.Style.FILL
+        this.setColor(context.getColor(R.color.grey_dialog))
+    }
 
     var imageDrawable: Drawable? = null
         set(value) {
             field = value
             imageView.setImageDrawable(field)
             requestLayout()
+            invalidate()
         }
 
     init {
+        setWillNotDraw(false)
         context.withStyledAttributes(attributeSet, R.styleable.CharCardLayout) {
             val backgroundDrawable = this.getDrawable(R.styleable.CharCardLayout_android_background)
-            this@ChatCardLayout.background = backgroundDrawable
+            this@MessageCardLayout.background = backgroundDrawable
         }
 
         initImage()
@@ -91,22 +103,28 @@ class ChatCardLayout @JvmOverloads constructor(
             val view = getChildAt(i)
             measureChild(view, widthMeasureSpec, heightMeasureSpec)
         }
-        val parentWidth = MeasureSpec.getSize(widthMeasureSpec)
+        val parentWidth = (MeasureSpec.getSize(widthMeasureSpec) * 0.7f).toInt()
         val messageDesiredWidth = MeasureSpec.makeMeasureSpec(
-            parentWidth - dateTextView.measuredWidth - imageView.measuredWidth - defaultMargin * 3,
-            MeasureSpec.EXACTLY
+            parentWidth - dateTextView.measuredWidth - imageView.measuredWidth - defaultMargin * 4,
+            MeasureSpec.AT_MOST
         )
         messageTextView.measure(messageDesiredWidth, messageTextView.measuredHeight)
         emojiLayout.measure(messageDesiredWidth, emojiLayout.measuredHeight)
         val wantedHeight = maxOf(
             paddingTop + paddingBottom + imageView.measuredHeight + imageView.marginTop,
             paddingTop + paddingBottom + imageView.marginTop + nameTextView.measuredHeight + messageTextView.measuredHeight + emojiLayout.measuredHeight
-        )
-        val actualSize = resolveSize(
+        ) + 3 * defaultMargin
+        /*var wantedWidth = paddingStart + paddingEnd + imageView.measuredWidth + maxOf(
+            emojiLayout.measuredWidth,
+            maxOf(nameTextView.measuredWidth, messageTextView.measuredWidth)
+        ) + defaultMargin * 4*/
+
+        val actualWidth = resolveSize(parentWidth, widthMeasureSpec)
+        val actualHeight = resolveSize(
             wantedHeight,
             heightMeasureSpec
         )
-        setMeasuredDimension(widthMeasureSpec, actualSize)
+        setMeasuredDimension(actualWidth, actualHeight)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -115,8 +133,8 @@ class ChatCardLayout @JvmOverloads constructor(
         val imageTop = paddingTop + imageView.marginTop
         val imageBottom = imageTop + imageView.measuredHeight
 
-        val nameStart = imageEnd + nameTextView.marginStart
-        val nameBottom = imageTop + nameTextView.measuredHeight
+        val nameStart = imageEnd + nameTextView.marginStart + defaultMargin
+        val nameBottom = imageTop + defaultMargin + nameTextView.measuredHeight
 
         val dateEnd = width - defaultMargin
         val dateStart = dateEnd - dateTextView.measuredWidth
@@ -124,17 +142,34 @@ class ChatCardLayout @JvmOverloads constructor(
         val messageBottom = nameBottom + messageTextView.measuredHeight
 
         imageView.layout(imageStart, imageTop, imageEnd, imageBottom)
-        dateTextView.layout(dateStart, imageTop, dateEnd, imageTop + dateTextView.measuredHeight)
+        //dateTextView.layout(dateStart, imageTop, dateEnd, imageTop + dateTextView.measuredHeight)
 
-        nameTextView.layout(nameStart, imageTop, dateStart, nameBottom)
+        nameTextView.layout(nameStart, imageTop + defaultMargin, dateStart, nameBottom)
 
         messageTextView.layout(nameStart, nameBottom, dateStart, messageBottom)
 
         emojiLayout.layout(
-            nameStart,
-            messageBottom + defaultMargin,
+            imageEnd + defaultMargin,
+            messageBottom + 2 * defaultMargin,
             dateStart,
-            messageBottom + defaultMargin + emojiLayout.measuredHeight
+            messageBottom + 2 * defaultMargin + emojiLayout.measuredHeight
+        )
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        val start = (imageView.left + imageView.measuredWidth + defaultMargin).toFloat()
+
+        val bottom =
+            paddingTop + 24f.dp(context) + nameTextView.measuredHeight + messageTextView.measuredHeight
+
+        canvas.drawRoundRect(
+            start,
+            imageView.top.toFloat(),
+            measuredWidth.toFloat(),
+            bottom,
+            16f.dp(context),
+            16f.dp(context),
+            backgroundPaint
         )
     }
 
@@ -162,7 +197,7 @@ class ChatCardLayout @JvmOverloads constructor(
         nameTextView.updateLayoutParams<MarginLayoutParams> {
             this.marginStart = defaultMargin
         }
-        nameTextView.setTextColor(Color.BLACK)
+        nameTextView.setTextColor(context.getColor(R.color.teal_400))
         addView(nameTextView)
     }
 
@@ -176,7 +211,7 @@ class ChatCardLayout @JvmOverloads constructor(
     private fun initMessage() {
         val messageTextView = TextView(context)
         messageTextView.id = R.id.emojiMessage
-        messageTextView.setTextColor(Color.BLACK)
+        messageTextView.setTextColor(context.getColor(R.color.white))
         addView(messageTextView)
     }
 
@@ -186,16 +221,17 @@ class ChatCardLayout @JvmOverloads constructor(
         addView(flexBoxLayout)
     }
 
-    fun addEmoji(list: List<Emoji>) {
-        list.forEach { emoji ->
-            emojiLayout.addEmoji(emoji)
+    fun addReaction(list: List<Reaction>) {
+        val viewsToRemove = mutableListOf<View>()
+        for (i in 1 until emojiLayout.childCount) {
+            viewsToRemove.add(emojiLayout.getChildAt(i))
         }
-        requestLayout()
-    }
-
-    fun addEmoji(emoji: Emoji) {
-        emojiLayout.addEmoji(emoji)
-        requestLayout()
+        viewsToRemove.forEach {
+            emojiLayout.removeView(it)
+        }
+        list.forEach { reaction ->
+            emojiLayout.addEmoji(reaction)
+        }
     }
 
     fun addOnAddButtonClickListener(listener: () -> Unit) {

@@ -25,6 +25,7 @@ class EmojiView @JvmOverloads constructor(
             if (field != value) {
                 field = value
                 requestLayout()
+                invalidate()
             }
         }
 
@@ -33,6 +34,7 @@ class EmojiView @JvmOverloads constructor(
             if (field != value) {
                 field = value
                 requestLayout()
+                invalidate()
             }
         }
 
@@ -41,6 +43,7 @@ class EmojiView @JvmOverloads constructor(
             if (field != value) {
                 field = value
                 this.isSelected = field
+                requestLayout()
                 invalidate()
             }
         }
@@ -51,7 +54,7 @@ class EmojiView @JvmOverloads constructor(
         get() = "$emoji $count"
 
     private val textPaint = TextPaint().apply {
-        color = Color.BLACK
+        color = context.getColor(R.color.white)
     }
 
     private val textRect = Rect()
@@ -87,8 +90,7 @@ class EmojiView @JvmOverloads constructor(
                 count--
             else
                 count++
-
-            it.isSelected = !it.isSelected
+            isEmojiSelected = !isEmojiSelected
             onEmojiChangedListener?.invoke(v as EmojiView)
         }
     }
@@ -99,11 +101,6 @@ class EmojiView @JvmOverloads constructor(
             ARG_COUNT to count,
             ARG_IS_SELECTED to isSelected
         )
-    }
-
-    override fun onDetachedFromWindow() {
-        onEmojiChangedListener = null
-        super.onDetachedFromWindow()
     }
 
     @Suppress("DEPRECATION")
