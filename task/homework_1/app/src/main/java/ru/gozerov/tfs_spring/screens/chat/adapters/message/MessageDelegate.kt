@@ -50,7 +50,7 @@ class MessageDelegate(
         fun bind(data: MessageModel) {
             with(binding.root) {
                 tag = data
-                name = data.author
+                username = data.author
                 message = data.message
                 imageDrawable =
                     ContextCompat.getDrawable(context, R.drawable.ic_launcher_background)

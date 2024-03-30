@@ -119,7 +119,14 @@ class ChatViewModel : ViewModel() {
     }
 
     fun sendMessage(text: String) {
-        val message = UserMessageModel(Random.nextInt(1000, 10000), text, emptyList())
+        val message = UserMessageModel(Random.nextInt(1000, 10000), text,  listOf(Reaction("\uD83D\uDE00", Random.nextInt(1,5
+        ), Random.nextBoolean()), Reaction("\uD83D\uDE00", Random.nextInt(1,5
+        ), Random.nextBoolean()), Reaction("\uD83D\uDE00", Random.nextInt(1,5
+        ), Random.nextBoolean()), Reaction("\uD83D\uDE00", Random.nextInt(1,5
+        ), Random.nextBoolean()), Reaction("\uD83D\uDE00", Random.nextInt(1,5
+        ), Random.nextBoolean()), Reaction("\uD83D\uDE00", Random.nextInt(1,5
+        ), Random.nextBoolean()))
+        )
         val newItems = _messagesWithDate.value + UserMessageDelegateItem(_messagesWithDate.value.size, message)
         viewModelScope.launch {
             _messagesWithDate.emit(newItems)

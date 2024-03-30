@@ -73,29 +73,24 @@ class UserMessageCardLayout @JvmOverloads constructor(
         }
         val parentWidth = (MeasureSpec.getSize(widthMeasureSpec))
         val messageDesiredWidth = MeasureSpec.makeMeasureSpec(
-            (parentWidth * 0.6).toInt() - dateTextView.measuredWidth - defaultMargin * 3,
+            (parentWidth * 0.6).toInt() - dateTextView.measuredWidth,
             MeasureSpec.AT_MOST
         )
         messageTextView.measure(messageDesiredWidth, messageTextView.measuredHeight)
         emojiLayout.measure(messageDesiredWidth, emojiLayout.measuredHeight)
         val wantedHeight =
             paddingTop + paddingBottom + messageTextView.measuredHeight + emojiLayout.measuredHeight + 2 * defaultMargin
-        /*var wantedWidth = paddingStart + paddingEnd + imageView.measuredWidth + maxOf(
-            emojiLayout.measuredWidth,
-            maxOf(nameTextView.measuredWidth, messageTextView.measuredWidth)
-        ) + defaultMargin * 4*/
 
-        val actualWidth = resolveSize(parentWidth, widthMeasureSpec)
         val actualHeight = resolveSize(
             wantedHeight,
             heightMeasureSpec
         )
-        setMeasuredDimension(actualWidth, actualHeight)
+        setMeasuredDimension(parentWidth, actualHeight)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val messageEnd = width - 2 * defaultMargin
-        val messageStart = messageEnd - minOf((width * 0.6).toInt(), messageTextView.measuredWidth)
+        val messageStart = messageEnd - messageTextView.measuredWidth
         val messageTop = paddingTop + defaultMargin
         val messageBottom = messageTop + messageTextView.measuredHeight
         messageTextView.layout(messageStart, messageTop, messageEnd, messageBottom)
@@ -109,8 +104,13 @@ class UserMessageCardLayout @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
+        val minWidth = if (emojiLayout.childCount == 1) messageTextView.measuredWidth else maxOf(
+            messageTextView.measuredWidth,
+            emojiLayout.measuredWidth
+        )
+        val actualWidth = minOf((width * 0.6).toInt(), minWidth).toFloat()
         val end = width.toFloat() - defaultMargin
-        val start = width - defaultMargin - (width * 0.6).toFloat()
+        val start = width - defaultMargin * 3 - actualWidth
         val top = paddingTop.toFloat()
         val bottom = top + messageTextView.measuredHeight.toFloat() + 2 * defaultMargin
         canvas.drawRoundRect(
@@ -159,10 +159,6 @@ class UserMessageCardLayout @JvmOverloads constructor(
         list.forEach { reaction ->
             emojiLayout.addEmoji(reaction)
         }
-    }
-
-    fun addOnAddButtonClickListener(listener: () -> Unit) {
-        emojiLayout.addOnAddButtonClickListener(listener)
     }
 
     fun addOnEmojiChangedListener(listener: (view: EmojiView) -> Unit) {

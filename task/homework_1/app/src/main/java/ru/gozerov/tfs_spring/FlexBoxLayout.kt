@@ -25,6 +25,9 @@ class FlexBoxLayout @JvmOverloads constructor(
     private val addButtonWidth = 42f.dp(context).toInt()
     private val addButtonHeight = 28f.dp(context).toInt()
 
+    var lineCount = DEFAULT_LINE_COUNT
+        private set
+
     var onEmojiChangedListener: ((view: EmojiView) -> Unit)? = null
 
     private val addButton
@@ -60,12 +63,11 @@ class FlexBoxLayout @JvmOverloads constructor(
             else
                 measureChildWithMargins(childView, widthMeasureSpec, 0, heightMeasureSpec, 0)
         }
+        lineCount = DEFAULT_LINE_COUNT
 
         val parentWidth = MeasureSpec.getSize(widthMeasureSpec)
-
         var actualWidth = 0
         var wantedWidth = 0
-        var lineCount = DEFAULT_LINE_COUNT
 
         for (i in 1 until childCount) {
             val view = getChildAt(i)
@@ -80,7 +82,8 @@ class FlexBoxLayout @JvmOverloads constructor(
         if (actualWidth == 0) actualWidth = wantedWidth
         if (wantedWidth + addButton.measuredWidth > parentWidth)
             lineCount++
-
+        else if (lineCount == 1)
+            actualWidth += addButton.measuredWidth
         val cellHeight =
             if (firstEmoji != null) firstEmoji.measuredHeight else addButton.measuredWidth
 
