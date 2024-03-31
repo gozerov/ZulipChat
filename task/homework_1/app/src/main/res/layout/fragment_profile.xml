@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_background">
+
+    <ImageView
+        android:id="@+id/imgAccount"
+        android:layout_width="@dimen/_186dp"
+        android:layout_height="@dimen/_186dp"
+        android:layout_marginBottom="@dimen/_120dp"
+        android:contentDescription="@string/contentDescription"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_16dp"
+        android:layout_marginTop="@dimen/_16dp"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_32sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imgAccount"
+        tools:text="Profile" />
+
+    <TextView
+        android:id="@+id/txtStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_4dp"
+        android:textColor="@color/grey_text"
+        android:textSize="@dimen/_18sp"
+        app:layout_constraintEnd_toStartOf="@id/txtOnline"
+        app:layout_constraintStart_toStartOf="@id/txtUsername"
+        app:layout_constraintTop_toBottomOf="@id/txtUsername"
+        tools:text="In a meeting" />
+
+    <TextView
+        android:id="@+id/txtOnline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/green"
+        android:layout_marginStart="@dimen/_16dp"
+        app:layout_constraintBaseline_toBaselineOf="@id/txtStatus"
+        app:layout_constraintEnd_toEndOf="@id/txtUsername"
+        app:layout_constraintStart_toEndOf="@id/txtStatus"
+        tools:text="online" />
+    
+    <Button
+        android:layout_width="@dimen/_160dp"
+        android:layout_height="@dimen/_56dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtStatus"
+        app:layout_constraintVertical_bias="0.7"
+        android:text="@string/log_out"
+        android:textSize="@dimen/_18sp"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/grey_button"
+ />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,4 @@
-package ru.gozerov.tfs_spring
+package ru.gozerov.core.views
 
 import android.content.Context
 import android.graphics.Canvas
@@ -15,6 +15,7 @@ import androidx.core.content.withStyledAttributes
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.core.view.updateLayoutParams
+import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.screens.chat.adapters.message.Reaction
 import ru.gozerov.tfs_spring.utils.dp
 

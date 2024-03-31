@@ -1,10 +1,11 @@
-package ru.gozerov.tfs_spring
+package ru.gozerov.core.views
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.withStyledAttributes
+import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.screens.chat.adapters.message.Reaction
 import ru.gozerov.tfs_spring.utils.dp
 

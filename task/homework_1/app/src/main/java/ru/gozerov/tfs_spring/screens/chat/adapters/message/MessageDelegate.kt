@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import ru.gozerov.core.AdapterDelegate
 import ru.gozerov.core.DelegateItem
-import ru.gozerov.tfs_spring.MessageCardLayout
+import ru.gozerov.core.views.MessageCardLayout
 import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.databinding.ItemMessageBinding
 

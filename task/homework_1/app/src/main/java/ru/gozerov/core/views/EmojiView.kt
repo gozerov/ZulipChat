@@ -1,8 +1,7 @@
-package ru.gozerov.tfs_spring
+package ru.gozerov.core.views
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Parcelable
@@ -11,6 +10,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.withStyledAttributes
 import androidx.core.os.bundleOf
+import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.utils.sp
 
 class EmojiView @JvmOverloads constructor(

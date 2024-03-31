@@ -3,4 +3,9 @@
     <string name="main_activity">MainActivity</string>
     <string name="contentDescription">contentDescription</string>
     <string name="send">Написать…</string>
+    <string name="channels">Channels</string>
+    <string name="people">People</string>
+    <string name="profile">Profile</string>
+    <string name="log_out">Log out</string>
+    <string name="online">online</string>
 </resources>
