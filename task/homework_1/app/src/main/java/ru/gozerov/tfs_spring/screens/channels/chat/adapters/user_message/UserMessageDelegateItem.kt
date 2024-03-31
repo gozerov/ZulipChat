@@ -1,10 +1,10 @@
-package ru.gozerov.tfs_spring.screens.chat.adapters.message
+package ru.gozerov.tfs_spring.screens.channels.chat.adapters.user_message
 
 import ru.gozerov.core.DelegateItem
 
-class MessageDelegateItem(
+class UserMessageDelegateItem(
     val id: Int,
-    private val value: MessageModel
+    private val value: UserMessageModel
 ) : DelegateItem {
 
     override fun content(): Any = value
@@ -12,6 +12,6 @@ class MessageDelegateItem(
     override fun id(): Int = id
 
     override fun compareToOther(other: DelegateItem): Boolean =
-        (other as MessageDelegateItem).content() == content()
+        (other as UserMessageDelegateItem).content() == content()
 
 }

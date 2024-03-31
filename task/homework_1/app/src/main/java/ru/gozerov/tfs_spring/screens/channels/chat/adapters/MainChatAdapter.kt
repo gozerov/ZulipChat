@@ -1,4 +1,4 @@
-package ru.gozerov.tfs_spring.screens.chat.adapters
+package ru.gozerov.tfs_spring.screens.channels.chat.adapters
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter

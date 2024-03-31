@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.withStyledAttributes
 import ru.gozerov.tfs_spring.R
-import ru.gozerov.tfs_spring.screens.chat.adapters.message.Reaction
+import ru.gozerov.tfs_spring.screens.channels.chat.adapters.message.Reaction
 import ru.gozerov.tfs_spring.utils.dp
 
 class UserMessageCardLayout @JvmOverloads constructor(

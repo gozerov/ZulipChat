@@ -6,8 +6,12 @@
 
     <fragment
         android:id="@id/nav_channels"
-        android:name="ru.gozerov.tfs_spring.screens.chat.ChatFragment"
-        android:label="ChatFragment" />
+        android:name="ru.gozerov.tfs_spring.screens.channels.list.ChannelListFragment"
+        android:label="ChannelListFragment" >
+        <action
+            android:id="@+id/action_nav_channels_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
     <fragment
         android:id="@id/nav_contacts"
         android:name="ru.gozerov.tfs_spring.screens.contacts.list.ContactsFragment"
@@ -28,4 +32,15 @@
         android:id="@id/nav_profile"
         android:name="ru.gozerov.tfs_spring.screens.profile.ProfileFragment"
         android:label="ProfileFragment" />
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="ru.gozerov.tfs_spring.screens.channels.chat.ChatFragment"
+        android:label="ChatFragment" >
+        <argument
+            android:name="topicId"
+            app:argType="integer" />
+        <argument
+            android:name="channelName"
+            app:argType="string" />
+    </fragment>
 </navigation>

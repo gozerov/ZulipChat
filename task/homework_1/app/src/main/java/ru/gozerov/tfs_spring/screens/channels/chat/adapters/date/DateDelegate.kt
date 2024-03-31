@@ -1,4 +1,4 @@
-package ru.gozerov.tfs_spring.screens.chat.adapters.date
+package ru.gozerov.tfs_spring.screens.channels.chat.adapters.date
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

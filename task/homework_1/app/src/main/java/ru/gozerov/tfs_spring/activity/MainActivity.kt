@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity(), ToolbarHolder {
 
             is ToolbarState.NavUpWithTitle -> {
                 binding.toolbar.visibility = View.VISIBLE
-                window.statusBarColor = getColor(toolbarState.backgroundColor)
+                binding.toolbar.setBackgroundColor(getColor(toolbarState.backgroundColor))
                 window.statusBarColor = getColor(toolbarState.backgroundColor)
                 binding.startActionButton.visibility = View.VISIBLE
                 binding.startActionButton.setImageResource(R.drawable.ic_arrow_back_24)
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity(), ToolbarHolder {
                 binding.endActionButton.setImageResource(R.drawable.ic_search_24)
                 binding.endActionButton.visibility = View.VISIBLE
                 binding.startToolbarTitle.visibility = View.VISIBLE
-                binding.startToolbarTitle.text = getString(R.string.users_and)
+                binding.startToolbarTitle.text = toolbarState.title
                 binding.centerToolbarTitle.visibility = View.GONE
                 window.statusBarColor = getColor(R.color.grey_secondary_background)
             }

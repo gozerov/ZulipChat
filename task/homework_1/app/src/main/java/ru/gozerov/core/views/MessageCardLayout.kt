@@ -16,7 +16,7 @@ import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.core.view.updateLayoutParams
 import ru.gozerov.tfs_spring.R
-import ru.gozerov.tfs_spring.screens.chat.adapters.message.Reaction
+import ru.gozerov.tfs_spring.screens.channels.chat.adapters.message.Reaction
 import ru.gozerov.tfs_spring.utils.dp
 
 class MessageCardLayout @JvmOverloads constructor(

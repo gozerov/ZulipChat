@@ -1,4 +1,4 @@
-package ru.gozerov.tfs_spring.screens.chat
+package ru.gozerov.tfs_spring.screens.channels.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,13 +7,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.gozerov.core.DelegateItem
-import ru.gozerov.tfs_spring.screens.chat.adapters.date.DateDelegateItem
-import ru.gozerov.tfs_spring.screens.chat.adapters.date.DateModel
-import ru.gozerov.tfs_spring.screens.chat.adapters.message.MessageDelegateItem
-import ru.gozerov.tfs_spring.screens.chat.adapters.message.MessageModel
-import ru.gozerov.tfs_spring.screens.chat.adapters.message.Reaction
-import ru.gozerov.tfs_spring.screens.chat.adapters.user_message.UserMessageDelegateItem
-import ru.gozerov.tfs_spring.screens.chat.adapters.user_message.UserMessageModel
+import ru.gozerov.tfs_spring.screens.channels.chat.adapters.date.DateDelegateItem
+import ru.gozerov.tfs_spring.screens.channels.chat.adapters.date.DateModel
+import ru.gozerov.tfs_spring.screens.channels.chat.adapters.message.MessageDelegateItem
+import ru.gozerov.tfs_spring.screens.channels.chat.adapters.message.MessageModel
+import ru.gozerov.tfs_spring.screens.channels.chat.adapters.message.Reaction
+import ru.gozerov.tfs_spring.screens.channels.chat.adapters.user_message.UserMessageDelegateItem
+import ru.gozerov.tfs_spring.screens.channels.chat.adapters.user_message.UserMessageModel
 import kotlin.random.Random
 
 class ChatViewModel : ViewModel() {

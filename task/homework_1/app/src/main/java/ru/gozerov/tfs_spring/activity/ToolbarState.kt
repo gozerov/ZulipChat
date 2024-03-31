@@ -10,7 +10,9 @@ sealed class ToolbarState {
         @ColorRes val color: Int
     ): ToolbarState()
 
-    object Search : ToolbarState()
+    class Search(
+        val title: String
+    ) : ToolbarState()
 
     class NavUpWithTitle(
         @ColorRes val backgroundColor: Int,

@@ -1,4 +1,4 @@
-package ru.gozerov.tfs_spring.screens.chat.adapters.message
+package ru.gozerov.tfs_spring.screens.channels.chat.adapters.message
 
 import android.view.LayoutInflater
 import android.view.View

@@ -1,4 +1,4 @@
-package ru.gozerov.tfs_spring.screens.chat
+package ru.gozerov.tfs_spring.screens.channels.chat
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,14 +10,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.launch
 import ru.gozerov.tfs_spring.R
+import ru.gozerov.tfs_spring.activity.ToolbarState
+import ru.gozerov.tfs_spring.activity.updateToolbar
 import ru.gozerov.tfs_spring.databinding.FragmentChatBinding
-import ru.gozerov.tfs_spring.screens.chat.adapters.MainChatAdapter
-import ru.gozerov.tfs_spring.screens.chat.adapters.date.DateDelegate
-import ru.gozerov.tfs_spring.screens.chat.adapters.message.MessageDelegate
-import ru.gozerov.tfs_spring.screens.chat.adapters.user_message.UserMessageDelegate
-import ru.gozerov.tfs_spring.screens.chat.dialog.SelectEmojiFragment
+import ru.gozerov.tfs_spring.screens.channels.chat.adapters.MainChatAdapter
+import ru.gozerov.tfs_spring.screens.channels.chat.adapters.date.DateDelegate
+import ru.gozerov.tfs_spring.screens.channels.chat.adapters.message.MessageDelegate
+import ru.gozerov.tfs_spring.screens.channels.chat.adapters.user_message.UserMessageDelegate
+import ru.gozerov.tfs_spring.screens.channels.chat.dialog.SelectEmojiFragment
 import ru.gozerov.tfs_spring.utils.VerticalMarginItemDecoration
 
 class ChatFragment : Fragment() {
@@ -30,11 +33,15 @@ class ChatFragment : Fragment() {
         ViewModelProvider(this)[ChatViewModel::class.java]
     }
 
+    private val args: ChatFragmentArgs by navArgs()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        updateToolbar(ToolbarState.NavUpWithTitle(R.color.teal_400, args.channelName))
+
         binding = FragmentChatBinding.inflate(inflater, container, false)
 
         binding.messageInputField.addTextChangedListener { editable ->

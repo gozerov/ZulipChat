@@ -38,7 +38,7 @@ class ContactsFragment : Fragment() {
     ): View {
         binding = FragmentContactsBinding.inflate(inflater, container, false)
         viewModel.handleIntent(ContactsIntent.LoadContacts)
-        updateToolbar(ToolbarState.Search)
+        updateToolbar(ToolbarState.Search(getString(R.string.users_and)))
         return binding.root
     }
 

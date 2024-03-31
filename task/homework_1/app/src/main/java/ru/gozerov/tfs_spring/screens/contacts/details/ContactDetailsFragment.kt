@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.navArgs
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import kotlinx.coroutines.launch
@@ -30,13 +31,15 @@ class ContactDetailsFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding
 
+    private val args: ContactDetailsFragmentArgs by navArgs()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
-        viewModel.handleIntent(ContactDetailsIntent.LoadContact(requireArguments().getInt(ARG_ID)))
+        viewModel.handleIntent(ContactDetailsIntent.LoadContact(args.contactId))
         updateToolbar(
             ToolbarState.NavUpWithTitle(
                 R.color.grey_secondary_background,
@@ -73,15 +76,6 @@ class ContactDetailsFragment : Fragment() {
                 }
             }
         }
-    }
-
-    companion object {
-
-        private const val ARG_ID = "id"
-
-        fun newInstance(id: Int): ContactDetailsFragment =
-            ContactDetailsFragment().apply { arguments = bundleOf(ARG_ID to id) }
-
     }
 
 }

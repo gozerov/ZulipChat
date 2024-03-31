@@ -1,4 +1,4 @@
-package ru.gozerov.tfs_spring.screens.chat.dialog
+package ru.gozerov.tfs_spring.screens.channels.chat.dialog
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
 import ru.gozerov.tfs_spring.databinding.FragmentSelectEmojiBinding
-import ru.gozerov.tfs_spring.screens.chat.ChatViewModel
+import ru.gozerov.tfs_spring.screens.channels.chat.ChatViewModel
 import ru.gozerov.tfs_spring.utils.GridMarginItemDecoration
 
 class SelectEmojiFragment : BottomSheetDialogFragment() {
