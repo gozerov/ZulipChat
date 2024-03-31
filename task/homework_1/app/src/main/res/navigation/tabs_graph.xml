@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tabs_graph"
+    app:startDestination="@id/nav_channels">
+
+    <fragment
+        android:id="@id/nav_channels"
+        android:name="ru.gozerov.tfs_spring.screens.chat.ChatFragment"
+        android:label="ChatFragment" />
+    <fragment
+        android:id="@id/nav_contacts"
+        android:name="ru.gozerov.tfs_spring.screens.contacts.list.ContactsFragment"
+        android:label="ContactsFragment" >
+        <action
+            android:id="@+id/action_contactsFragment_to_contactDetailsFragment"
+            app:destination="@id/contactDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/contactDetailsFragment"
+        android:name="ru.gozerov.tfs_spring.screens.contacts.details.ContactDetailsFragment"
+        android:label="ContactDetailsFragment" >
+        <argument
+            android:name="contactId"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@id/nav_profile"
+        android:name="ru.gozerov.tfs_spring.screens.profile.ProfileFragment"
+        android:label="ProfileFragment" />
+</navigation>

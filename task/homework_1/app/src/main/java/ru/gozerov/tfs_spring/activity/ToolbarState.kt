@@ -14,7 +14,8 @@ sealed class ToolbarState {
 
     class NavUpWithTitle(
         @ColorRes val backgroundColor: Int,
-        val title: String
+        val title: String,
+        val gravity: TitleGravity = TitleGravity.START
     ) : ToolbarState()
 
 }

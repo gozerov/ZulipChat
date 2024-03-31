@@ -1,24 +1,14 @@
 package ru.gozerov.tfs_spring.activity
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import androidx.activity.SystemBarStyle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import com.github.terrakok.cicerone.androidx.AppNavigator
+import androidx.navigation.findNavController
 import ru.gozerov.tfs_spring.R
-import ru.gozerov.tfs_spring.app.navigationHolder
-import ru.gozerov.tfs_spring.app.router
 import ru.gozerov.tfs_spring.databinding.ActivityMainBinding
-import ru.gozerov.tfs_spring.navigation.Screens
 
 class MainActivity : AppCompatActivity(), ToolbarHolder {
-
-    private val navigator = AppNavigator(this, R.id.globalFragmentContainer)
 
     private lateinit var binding: ActivityMainBinding
 
@@ -32,20 +22,6 @@ class MainActivity : AppCompatActivity(), ToolbarHolder {
 
         setContentView(binding.root)
 
-
-        if (savedInstanceState == null) {
-            router.newRootScreen(Screens.Tabs())
-        }
-    }
-
-    override fun onResumeFragments() {
-        super.onResumeFragments()
-        navigationHolder.setNavigator(navigator)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        navigationHolder.removeNavigator()
     }
 
     override fun updateToolbar(toolbarState: ToolbarState) {
@@ -53,12 +29,46 @@ class MainActivity : AppCompatActivity(), ToolbarHolder {
             is ToolbarState.None -> {
                 binding.toolbar.visibility = View.GONE
             }
+
             is ToolbarState.OnlyStatusColor -> {
                 binding.toolbar.visibility = View.GONE
                 window.statusBarColor = getColor(toolbarState.color)
             }
-            is ToolbarState.NavUpWithTitle -> {}
-            is ToolbarState.Search -> {}
+
+            is ToolbarState.NavUpWithTitle -> {
+                binding.toolbar.visibility = View.VISIBLE
+                window.statusBarColor = getColor(toolbarState.backgroundColor)
+                window.statusBarColor = getColor(toolbarState.backgroundColor)
+                binding.startActionButton.visibility = View.VISIBLE
+                binding.startActionButton.setImageResource(R.drawable.ic_arrow_back_24)
+                binding.endActionButton.visibility = View.GONE
+                binding.startActionButton.setOnClickListener {
+                    findNavController(R.id.localFragmentContainer).popBackStack()
+                }
+                when(toolbarState.gravity) {
+                    TitleGravity.START -> {
+                        binding.startToolbarTitle.visibility = View.VISIBLE
+                        binding.startToolbarTitle.text = toolbarState.title
+                        binding.centerToolbarTitle.visibility = View.GONE
+                    }
+                    TitleGravity.CENTER -> {
+                        binding.centerToolbarTitle.visibility = View.VISIBLE
+                        binding.centerToolbarTitle.text = toolbarState.title
+                        binding.startToolbarTitle.visibility = View.GONE
+                    }
+                }
+            }
+            is ToolbarState.Search -> {
+                binding.toolbar.visibility = View.VISIBLE
+                binding.toolbar.setBackgroundColor(getColor(R.color.grey_secondary_background))
+                binding.startActionButton.visibility = View.GONE
+                binding.endActionButton.setImageResource(R.drawable.ic_search_24)
+                binding.endActionButton.visibility = View.VISIBLE
+                binding.startToolbarTitle.visibility = View.VISIBLE
+                binding.startToolbarTitle.text = getString(R.string.users_and)
+                binding.centerToolbarTitle.visibility = View.GONE
+                window.statusBarColor = getColor(R.color.grey_secondary_background)
+            }
         }
     }
 

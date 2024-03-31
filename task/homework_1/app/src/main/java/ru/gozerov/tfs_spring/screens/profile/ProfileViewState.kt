@@ -5,6 +5,7 @@ sealed class ProfileViewState {
     object Empty: ProfileViewState()
 
     class LoadedProfile(
+        val id: Int,
         val imageUrl: String,
         val username: String,
         val status: String,

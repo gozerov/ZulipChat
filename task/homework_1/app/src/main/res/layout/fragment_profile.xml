@@ -54,6 +54,7 @@
         tools:text="online" />
     
     <Button
+        android:id="@+id/logOutButton"
         android:layout_width="@dimen/_160dp"
         android:layout_height="@dimen/_56dp"
         app:layout_constraintStart_toStartOf="parent"
