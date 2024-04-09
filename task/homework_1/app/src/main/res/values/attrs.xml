@@ -7,7 +7,14 @@
     <declare-styleable name="FlexBoxLayout">
         <attr name="innerPadding" format="dimension"/>
     </declare-styleable>
-    <declare-styleable name="CharCardLayout">
+    <declare-styleable name="MessageCardLayout">
+        <attr name="android:src" format="reference"/>
+        <attr name="username" format="string"/>
+        <attr name="message" format="string"/>
         <attr name="android:background" format="reference"/>
+        <attr name="titleTextAppearance" format="reference"/>
+        <attr name="messageTextAppearance" format="reference"/>
+        <attr name="defaultMargin" format="dimension"/>
+        <attr name="imageSize" format="dimension"/>
     </declare-styleable>
 </resources>

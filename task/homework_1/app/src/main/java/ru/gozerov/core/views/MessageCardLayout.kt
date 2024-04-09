@@ -10,10 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
-import androidx.core.view.marginStart
-import androidx.core.view.marginTop
 import androidx.core.view.updateLayoutParams
 import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.screens.channels.chat.adapters.message.Reaction
@@ -27,18 +24,14 @@ class MessageCardLayout @JvmOverloads constructor(
 ) : ViewGroup(context, attributeSet, defStyle, defTheme) {
 
     private val imageView: ImageView
-        get() = getChildAt(0) as ImageView
 
     private val usernameTextView: TextView
-        get() = getChildAt(1) as TextView
 
     private val dateTextView: TextView
-        get() = getChildAt(2) as TextView
 
     private val messageTextView: TextView
-        get() = getChildAt(3) as TextView
+
     private val emojiLayout: FlexBoxLayout
-        get() = getChildAt(4) as FlexBoxLayout
 
     var username = ""
         set(value) {
@@ -70,8 +63,8 @@ class MessageCardLayout @JvmOverloads constructor(
             }
         }
 
-    private val imageSize = 40f.dp(context).toInt()
-    private val defaultMargin = 8f.dp(context).toInt()
+    private val imageSize: Int
+    private val defaultMargin: Int
     private val backgroundPaint = Paint().apply {
         style = Paint.Style.FILL
         this.setColor(context.getColor(R.color.grey_dialog))
@@ -87,11 +80,38 @@ class MessageCardLayout @JvmOverloads constructor(
 
     init {
         setWillNotDraw(false)
-        context.withStyledAttributes(attributeSet, R.styleable.CharCardLayout) {
-            val backgroundDrawable = this.getDrawable(R.styleable.CharCardLayout_android_background)
-            this@MessageCardLayout.background = backgroundDrawable
-        }
+        inflate(context, R.layout.layout_message_card, this)
 
+        imageView = findViewById(R.id.imgAvatar)
+        usernameTextView = findViewById(R.id.txtUsername)
+        dateTextView = findViewById(R.id.txtDate)
+        messageTextView = findViewById(R.id.txtMessage)
+        emojiLayout = findViewById(R.id.emojiLayout)
+
+        var margin = 0
+        var imageSize = 0
+
+        context.withStyledAttributes(attributeSet, R.styleable.MessageCardLayout) {
+            val backgroundDrawable =
+                this.getDrawable(R.styleable.MessageCardLayout_android_background)
+            this@MessageCardLayout.background = backgroundDrawable
+
+            val username = this.getString(R.styleable.MessageCardLayout_username)
+            usernameTextView.text = username
+
+            val message = this.getString(R.styleable.MessageCardLayout_message)
+            messageTextView.text = message
+
+            val drawable = this.getDrawable(R.styleable.MessageCardLayout_android_src)
+            imageView.setImageDrawable(drawable)
+
+            margin = this.getDimension(R.styleable.MessageCardLayout_defaultMargin, 8f.dp(context))
+                .toInt()
+            imageSize =
+                this.getDimension(R.styleable.MessageCardLayout_imageSize, 40f.dp(context)).toInt()
+        }
+        defaultMargin = margin
+        this.imageSize = imageSize
         initImage()
         initUsername(attributeSet)
         initDate()
@@ -106,7 +126,7 @@ class MessageCardLayout @JvmOverloads constructor(
         }
         val parentWidth = (MeasureSpec.getSize(widthMeasureSpec))
         val messageDesiredWidth = MeasureSpec.makeMeasureSpec(
-            (parentWidth * 0.7f).toInt() - dateTextView.measuredWidth - imageView.measuredWidth - defaultMargin * 4,
+            (parentWidth * 0.7f).toInt() - dateTextView.measuredWidth - imageView.measuredWidth - defaultMargin * 2,
             MeasureSpec.AT_MOST
         )
         messageTextView.measure(messageDesiredWidth, messageTextView.measuredHeight)
@@ -114,19 +134,10 @@ class MessageCardLayout @JvmOverloads constructor(
         usernameTextView.measure(messageDesiredWidth, usernameTextView.measuredHeight)
 
         val wantedHeight = maxOf(
-            paddingTop + paddingBottom + imageView.measuredHeight + imageView.marginTop,
-            paddingTop + paddingBottom + imageView.marginTop + usernameTextView.measuredHeight + messageTextView.measuredHeight + emojiLayout.measuredHeight
+            paddingTop + paddingBottom + imageView.measuredHeight + defaultMargin,
+            paddingTop + paddingBottom + defaultMargin + usernameTextView.measuredHeight + messageTextView.measuredHeight + emojiLayout.measuredHeight
         ) + 3 * defaultMargin
-        var wantedWidth = paddingStart + paddingEnd + imageView.measuredWidth + maxOf(
-            emojiLayout.measuredWidth,
-            maxOf(usernameTextView.measuredWidth, messageTextView.measuredWidth)
-        ) + defaultMargin * 4
-        wantedWidth = if (emojiLayout.lineCount > 1) parentWidth else maxOf(
-            wantedWidth,
-            180f.dp(context).toInt()
-        )
 
-        val actualWidth = resolveSize(wantedWidth, widthMeasureSpec)
         val actualHeight = resolveSize(
             wantedHeight,
             heightMeasureSpec
@@ -135,9 +146,9 @@ class MessageCardLayout @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        val imageStart = paddingStart + imageView.marginStart
+        val imageStart = paddingStart + defaultMargin
         val imageEnd = imageStart + imageView.measuredWidth
-        val imageTop = paddingTop + imageView.marginTop
+        val imageTop = paddingTop + defaultMargin
         val imageBottom = imageTop + imageView.measuredHeight
 
         val nameStart = imageEnd + 2 * defaultMargin
@@ -181,12 +192,12 @@ class MessageCardLayout @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         val start = (imageView.left + imageView.measuredWidth + defaultMargin).toFloat()
 
-        val end = if (emojiLayout.lineCount > 1) width*0.7f else minOf(
+        val end = if (emojiLayout.lineCount > 1) width * 0.7f else minOf(
             (width * 0.7f).toInt(),
             maxOf(maxOf(emojiLayout.right, messageTextView.right), usernameTextView.right)
         ).toFloat() + defaultMargin
         val bottom =
-            paddingTop + 24f.dp(context) + usernameTextView.measuredHeight + messageTextView.measuredHeight
+            paddingTop + defaultMargin * 3f + usernameTextView.measuredHeight + messageTextView.measuredHeight
 
         canvas.drawRoundRect(
             start,
@@ -204,47 +215,31 @@ class MessageCardLayout @JvmOverloads constructor(
     }
 
     private fun initImage() {
-        val imageView = ImageView(context)
-        imageView.id = R.id.emojiAvatar
         imageView.clipToOutline = true
-        imageView.background = ContextCompat.getDrawable(context, R.drawable.image_bg)
         imageView.layoutParams = MarginLayoutParams(imageSize, imageSize)
         imageView.updateLayoutParams<MarginLayoutParams> {
             this.marginStart = defaultMargin
             this.topMargin = defaultMargin
         }
-        addView(imageView)
     }
 
     private fun initUsername(attributeSet: AttributeSet?) {
-        val usernameTextView = TextView(context)
-        usernameTextView.id = R.id.emojiName
         usernameTextView.layoutParams = MarginLayoutParams(context, attributeSet)
         usernameTextView.updateLayoutParams<MarginLayoutParams> {
             this.marginStart = defaultMargin
         }
         usernameTextView.setTextColor(context.getColor(R.color.teal_400))
-        addView(usernameTextView)
     }
 
     private fun initDate() {
-        val dateTextView = TextView(context)
-        dateTextView.id = R.id.emojiDate
         dateTextView.setTextColor(Color.BLACK)
-        addView(dateTextView)
     }
 
     private fun initMessage() {
-        val messageTextView = TextView(context)
-        messageTextView.id = R.id.emojiMessage
         messageTextView.setTextColor(context.getColor(R.color.white))
-        addView(messageTextView)
     }
 
     private fun initEmojiLayout() {
-        val flexBoxLayout = FlexBoxLayout(context)
-        flexBoxLayout.id = R.id.emojiLayout
-        addView(flexBoxLayout)
     }
 
     fun addReaction(list: List<Reaction>) {

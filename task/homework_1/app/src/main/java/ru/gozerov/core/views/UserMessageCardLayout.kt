@@ -57,8 +57,8 @@ class UserMessageCardLayout @JvmOverloads constructor(
 
     init {
         setWillNotDraw(false)
-        context.withStyledAttributes(attributeSet, R.styleable.CharCardLayout) {
-            val backgroundDrawable = this.getDrawable(R.styleable.CharCardLayout_android_background)
+        context.withStyledAttributes(attributeSet, R.styleable.MessageCardLayout) {
+            val backgroundDrawable = this.getDrawable(R.styleable.MessageCardLayout_android_background)
             this@UserMessageCardLayout.background = backgroundDrawable
         }
 
