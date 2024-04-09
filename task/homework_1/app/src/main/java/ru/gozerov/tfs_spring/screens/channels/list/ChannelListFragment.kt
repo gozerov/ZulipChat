@@ -67,7 +67,6 @@ class ChannelListFragment : Fragment() {
                         findNavController().navigate(action)
                     }
                 }
-
             }
         )
         return binding.root
