@@ -43,7 +43,6 @@ class MainActivity : AppCompatActivity(), ToolbarHolder {
         window.statusBarColor = getColor(R.color.grey_secondary_background)
         window.navigationBarColor = getColor(R.color.black)
 
-        setContentView(binding.root)
         binding.searchEditText.addTextChangedListener { text: Editable? ->
             text?.let { _searchFieldFlow.tryEmit(text.toString()) }
         }

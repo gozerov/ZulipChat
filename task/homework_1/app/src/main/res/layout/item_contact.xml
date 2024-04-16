@@ -21,14 +21,12 @@
         android:layout_width="@dimen/_16dp"
         android:layout_height="@dimen/_16dp"
         android:contentDescription="@string/contentDescription"
-        android:src="@drawable/online_bg"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/imgContact"
         app:layout_constraintEnd_toEndOf="@id/imgContact" />
 
     <TextView
         android:id="@+id/txtUsername"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_16dp"
         android:ellipsize="end"
@@ -37,19 +35,21 @@
         android:textSize="@dimen/_18sp"
         app:layout_constraintBottom_toTopOf="@id/txtEmail"
         app:layout_constraintStart_toEndOf="@id/imgContact"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/lorem/random" />
 
     <TextView
         android:id="@+id/txtEmail"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
+        android:ellipsize="middle"
         android:lines="1"
         android:textColor="@color/grey_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/txtUsername"
         app:layout_constraintTop_toBottomOf="@id/txtUsername"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:text="@tools:sample/lorem/random" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

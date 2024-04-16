@@ -1,5 +1,6 @@
 package ru.gozerov.tfs_spring.screens.channels.list.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -7,15 +8,15 @@ import ru.gozerov.core.DelegateItem
 import ru.gozerov.tfs_spring.databinding.ItemChannelListBinding
 
 class ChannelPagerAdapter(
-    private val channelsAdapter: ChannelsAdapter
+    private val channelAdapters: List<ChannelsAdapter>
 ) : RecyclerView.Adapter<ChannelPagerAdapter.ViewHolder>() {
 
     inner class ViewHolder(private val binding: ItemChannelListBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(data: List<DelegateItem>) {
-            channelsAdapter.submitList(data)
-            binding.channelList.adapter = channelsAdapter
+        fun bind(position: Int, data: List<DelegateItem>) {
+            channelAdapters[position].submitList(data)
+            binding.channelList.adapter = channelAdapters[position]
             binding.root.tag = data
         }
 
@@ -39,7 +40,7 @@ class ChannelPagerAdapter(
     override fun getItemCount(): Int = data.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(data[position])
+        holder.bind(position, data[position])
     }
 
 }

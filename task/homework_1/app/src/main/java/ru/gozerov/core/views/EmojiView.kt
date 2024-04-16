@@ -20,7 +20,7 @@ class EmojiView @JvmOverloads constructor(
     defTheme: Int = 0
 ) : View(context, attributeSet, defStyle, defTheme), View.OnClickListener {
 
-    var emoji: String = ""
+    var emojiCode: String = ""
         set(value) {
             if (field != value) {
                 field = value
@@ -28,6 +28,9 @@ class EmojiView @JvmOverloads constructor(
                 invalidate()
             }
         }
+
+    var emojiName: String = ""
+    var emojiType: String = ""
 
     var count: Int = DEFAULT_COUNT
         set(value) {
@@ -51,7 +54,7 @@ class EmojiView @JvmOverloads constructor(
     var onEmojiChangedListener: ((view: EmojiView) -> Unit)? = null
 
     private val text: String
-        get() = "$emoji $count"
+        get() = "$emojiCode $count"
 
     private val textPaint = TextPaint().apply {
         color = context.getColor(R.color.white)

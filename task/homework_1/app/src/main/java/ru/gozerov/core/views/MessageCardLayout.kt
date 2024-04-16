@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
+import android.text.Html
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +24,7 @@ class MessageCardLayout @JvmOverloads constructor(
     defTheme: Int = 0
 ) : ViewGroup(context, attributeSet, defStyle, defTheme) {
 
-    private val imageView: ImageView
+    val imageView: ImageView
 
     private val usernameTextView: TextView
 
@@ -47,7 +48,7 @@ class MessageCardLayout @JvmOverloads constructor(
         set(value) {
             if (field != value) {
                 field = value
-                messageTextView.text = field
+                messageTextView.text = Html.fromHtml(field, Html.FROM_HTML_MODE_COMPACT)
                 requestLayout()
                 invalidate()
             }
@@ -116,7 +117,6 @@ class MessageCardLayout @JvmOverloads constructor(
         initUsername(attributeSet)
         initDate()
         initMessage()
-        initEmojiLayout()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -237,9 +237,6 @@ class MessageCardLayout @JvmOverloads constructor(
 
     private fun initMessage() {
         messageTextView.setTextColor(context.getColor(R.color.white))
-    }
-
-    private fun initEmojiLayout() {
     }
 
     fun addReaction(list: List<Reaction>) {

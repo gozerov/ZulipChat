@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -18,6 +19,7 @@ import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.activity.TitleGravity
 import ru.gozerov.tfs_spring.activity.ToolbarState
 import ru.gozerov.tfs_spring.activity.updateToolbar
+import ru.gozerov.tfs_spring.app.TFSApp
 import ru.gozerov.tfs_spring.databinding.FragmentProfileBinding
 import ru.gozerov.tfs_spring.screens.contacts.details.models.ContactDetailsIntent
 import ru.gozerov.tfs_spring.screens.contacts.details.models.ContactDetailsViewState
@@ -26,7 +28,11 @@ import ru.gozerov.tfs_spring.utils.dp
 class ContactDetailsFragment : Fragment() {
 
     private val viewModel: ContactDetailsViewModel by lazy {
-        ViewModelProvider(this)[ContactDetailsViewModel::class.java]
+        ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return ContactDetailsViewModel((requireContext().applicationContext as TFSApp).zulipApi) as T
+            }
+        })[ContactDetailsViewModel::class.java]
     }
 
     private lateinit var binding: FragmentProfileBinding
@@ -51,23 +57,22 @@ class ContactDetailsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.logOutButton.visibility = View.GONE
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.viewState.collect { state ->
                     when (state) {
                         is ContactDetailsViewState.Empty -> {}
                         is ContactDetailsViewState.LoadedContact -> {
-                            binding.imgAccount.load(state.imageUrl) {
+                            binding.imgAccount.load(state.userContact.imageUrl) {
                                 transformations(RoundedCornersTransformation(16f.dp(view.context)))
                             }
-                            binding.txtUsername.text = state.username
-                            binding.txtStatus.text = state.status
-                            if (state.isOnline) {
-                                binding.txtOnline.visibility = View.VISIBLE
+                            binding.txtUsername.text = state.userContact.username
+                            if (state.userContact.isOnline) {
                                 binding.txtOnline.text = getString(R.string.online)
+                                binding.txtOnline.setTextColor(view.context.getColor(R.color.green))
                             } else {
-                                binding.txtOnline.visibility = View.GONE
+                                binding.txtOnline.text = getString(R.string.offline)
+                                binding.txtOnline.setTextColor(view.context.getColor(R.color.red))
                             }
                         }
 

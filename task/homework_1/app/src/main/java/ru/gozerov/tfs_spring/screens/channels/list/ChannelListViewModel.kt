@@ -1,5 +1,6 @@
 package ru.gozerov.tfs_spring.screens.channels.list
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -7,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.gozerov.core.runCatchingNonCancellation
+import ru.gozerov.tfs_spring.api.ZulipApi
 import ru.gozerov.tfs_spring.screens.channels.list.adapters.topic.TopicModel
 import ru.gozerov.tfs_spring.screens.channels.list.models.ChannelListIntent
 import ru.gozerov.tfs_spring.screens.channels.list.models.ChannelListViewState
@@ -15,7 +17,9 @@ import ru.gozerov.tfs_spring.use_cases.GetChannelByIdUseCase
 import ru.gozerov.tfs_spring.use_cases.GetChannelsUseCase
 import ru.gozerov.tfs_spring.use_cases.GetSearchResultUseCase
 
-class ChannelListViewModel : ViewModel() {
+class ChannelListViewModel(
+    private val zulipApi: ZulipApi
+) : ViewModel() {
 
     private val _viewState = MutableStateFlow<ChannelListViewState>(ChannelListViewState.Empty)
     val viewState: StateFlow<ChannelListViewState> get() = _viewState.asStateFlow()
@@ -25,7 +29,7 @@ class ChannelListViewModel : ViewModel() {
             when (intent) {
                 is ChannelListIntent.LoadChannels -> {
                     runCatchingNonCancellation {
-                        GetChannelsUseCase()
+                        GetChannelsUseCase(zulipApi).invoke()
                     }
                         .map {
                             _viewState.emit(ChannelListViewState.LoadedChannels(it))
@@ -62,8 +66,8 @@ class ChannelListViewModel : ViewModel() {
         }
     }
 
-    suspend fun getChannelById(topic: TopicModel): String {
-        return GetChannelByIdUseCase.invoke(topic)
+    suspend fun getChannelById(topic: TopicModel, categoryId: Int): String {
+        return GetChannelByIdUseCase.invoke(topic, categoryId)
     }
 
 }

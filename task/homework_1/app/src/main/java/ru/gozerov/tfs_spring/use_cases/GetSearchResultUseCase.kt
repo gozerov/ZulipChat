@@ -11,19 +11,19 @@ object GetSearchResultUseCase {
 
     suspend operator fun invoke(request: String, categoryPosition: Int): SearchResult = withContext(Dispatchers.IO) {
         if (request.isBlank()) {
-            ChannelsStub.combinedChannels = ChannelsStub.originalCombinedChannels
-            return@withContext SearchResult(ChannelsStub.combinedChannels)
+            ChannelsStub.allCombinedChannels = ChannelsStub.originalAllCombinedChannels
+            return@withContext SearchResult(ChannelsStub.allCombinedChannels)
         } else {
             val category = ChannelsStub.categories[categoryPosition]
-            val items = ChannelsStub.combinedChannels[category]?.filter {
+            val items = ChannelsStub.allCombinedChannels[category]?.filter {
                 it is ChannelDelegateItem && (it.content() as ChannelModel).title.contains(
                     request
                 ) || it is TopicDelegateItem
             }
             items?.let {
                 if (Random.nextBoolean()) {
-                    ChannelsStub.combinedChannels = ChannelsStub.combinedChannels.mapValues { if (it.key == category) items else it.value }
-                    return@withContext SearchResult(ChannelsStub.combinedChannels)
+                    ChannelsStub.allCombinedChannels = ChannelsStub.allCombinedChannels.mapValues { if (it.key == category) items else it.value }
+                    return@withContext SearchResult(ChannelsStub.allCombinedChannels)
                 } else
                     error("ha-ha")
             } ?: error("unknown category")

@@ -141,9 +141,10 @@ class FlexBoxLayout @JvmOverloads constructor(
     fun addEmoji(reaction: Reaction) {
         val emojiView = EmojiView(context)
         addView(emojiView)
-
+        emojiView.emojiName = reaction.emojiName
         emojiView.count = reaction.count
-        emojiView.emoji = reaction.emojiCode
+        emojiView.emojiCode = reaction.emojiCode
+        emojiView.emojiType = reaction.emojiType
         emojiView.isEmojiSelected = reaction.isSelected
         emojiView.setPadding(
             emojiHorizontalPadding,

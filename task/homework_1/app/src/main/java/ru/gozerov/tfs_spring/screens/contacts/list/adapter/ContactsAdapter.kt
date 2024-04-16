@@ -1,5 +1,6 @@
 package ru.gozerov.tfs_spring.screens.contacts.list.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.CircleCropTransformation
+import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.databinding.ItemContactBinding
 import ru.gozerov.tfs_spring.screens.contacts.list.models.UserContact
 
@@ -25,7 +27,8 @@ class ContactsAdapter(
                 }
                 txtUsername.text = data.username
                 txtEmail.text = data.email
-                imgOnline.visibility = if (data.isOnline) View.VISIBLE else View.GONE
+                Log.e("AAAA", data.isOnline.toString())
+                imgOnline.setBackgroundResource(if (data.isOnline) R.drawable.online_bg else R.drawable.offline_bg)
             }
         }
 

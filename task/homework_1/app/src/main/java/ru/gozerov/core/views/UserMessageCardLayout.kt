@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.text.Html
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -33,7 +34,7 @@ class UserMessageCardLayout @JvmOverloads constructor(
         set(value) {
             if (field != value) {
                 field = value
-                messageTextView.text = field
+                messageTextView.text = Html.fromHtml(field, Html.FROM_HTML_MODE_COMPACT)
                 requestLayout()
                 invalidate()
             }
@@ -160,6 +161,10 @@ class UserMessageCardLayout @JvmOverloads constructor(
         list.forEach { reaction ->
             emojiLayout.addEmoji(reaction)
         }
+    }
+
+    fun addOnAddButtonClickListener(listener: () -> Unit) {
+        emojiLayout.addOnAddButtonClickListener(listener)
     }
 
     fun addOnEmojiChangedListener(listener: (view: EmojiView) -> Unit) {

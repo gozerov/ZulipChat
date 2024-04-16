@@ -37,10 +37,10 @@
         android:name="ru.gozerov.tfs_spring.screens.channels.chat.ChatFragment"
         android:label="ChatFragment" >
         <argument
-            android:name="topicId"
-            app:argType="integer" />
+            android:name="topic"
+            app:argType="string" />
         <argument
-            android:name="channelName"
+            android:name="channel"
             app:argType="string" />
     </fragment>
 </navigation>

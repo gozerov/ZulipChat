@@ -50,4 +50,11 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.shimmer.android)
 
+    implementation(libs.retrofit2)
+    implementation(libs.moshi.converter)
+    implementation(platform(libs.okhttp3.bom))
+    implementation(libs.okhttp3)
+    implementation(libs.okhttp3.logging.interceptor)
+
+
 }

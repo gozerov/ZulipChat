@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.gozerov.tfs_spring.databinding.ItemEmojiBinding
 
 class SelectEmojiAdapter(
-    private val onEmojiClick: (String) -> Unit
+    private val onEmojiClick: (String, String, String) -> Unit
 ) : RecyclerView.Adapter<SelectEmojiAdapter.ViewHolder>(), View.OnClickListener {
 
     class ViewHolder(private val binding: ItemEmojiBinding) :
@@ -44,7 +44,7 @@ class SelectEmojiAdapter(
 
     override fun onClick(v: View?) {
         (v as? TextView)?.let { textView ->
-            this.onEmojiClick(textView.text.toString())
+            this.onEmojiClick("", "", textView.text.toString())
         }
     }
 

@@ -8,10 +8,11 @@ import ru.gozerov.tfs_spring.screens.channels.list.adapters.topic.TopicModel
 
 object GetChannelByIdUseCase {
 
-    suspend operator fun invoke(topic: TopicModel) = withContext(Dispatchers.IO) {
-        return@withContext (ChannelsStub.combinedChannels.values.first()
-            .first { it is ChannelDelegateItem && (it.content() as ChannelModel).id == topic.channelId }
-            .content() as ChannelModel).title
-    }
+    suspend operator fun invoke(topic: TopicModel, categoryPosition: Int) =
+        withContext(Dispatchers.IO) {
+            return@withContext (ChannelsStub.allCombinedChannels[ChannelsStub.categories[categoryPosition]]
+                ?.first { it is ChannelDelegateItem && (it.content() as ChannelModel).id == topic.channelId }
+                ?.content() as ChannelModel).title
+        }
 
 }

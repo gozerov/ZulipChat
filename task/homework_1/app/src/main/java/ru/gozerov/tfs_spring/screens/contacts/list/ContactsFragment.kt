@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -12,6 +13,7 @@ import kotlinx.coroutines.launch
 import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.activity.ToolbarState
 import ru.gozerov.tfs_spring.activity.updateToolbar
+import ru.gozerov.tfs_spring.app.TFSApp
 import ru.gozerov.tfs_spring.databinding.FragmentContactsBinding
 import ru.gozerov.tfs_spring.screens.contacts.list.adapter.ContactsAdapter
 import ru.gozerov.tfs_spring.screens.contacts.list.models.ContactsIntent
@@ -23,7 +25,11 @@ class ContactsFragment : Fragment() {
     private lateinit var binding: FragmentContactsBinding
 
     private val viewModel: ContactsViewModel by lazy {
-        ViewModelProvider(this)[ContactsViewModel::class.java]
+        ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return ContactsViewModel((requireContext().applicationContext as TFSApp).zulipApi) as T
+            }
+        })[ContactsViewModel::class.java]
     }
 
     private val contactsAdapter = ContactsAdapter {

@@ -1,5 +1,6 @@
 package ru.gozerov.tfs_spring.use_cases
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.gozerov.core.DelegateItem
@@ -13,7 +14,7 @@ object ExpandTopicsUseCase {
         withContext(Dispatchers.IO) {
             val newList = mutableListOf<DelegateItem>()
             val category = ChannelsStub.categories[categoryPosition]
-            val data = ChannelsStub.combinedChannels[category]!!
+            val data = ChannelsStub.allCombinedChannels[category]!!
             data.forEachIndexed { ind, e ->
                 if (e.content() is ChannelModel && (e.content() as ChannelModel).id == channel.id && ((ind != data.size - 1 && data[ind + 1] !is TopicDelegateItem) || ind == data.size - 1)) {
                     if ((e.content() as ChannelModel).topics.isNotEmpty())
@@ -34,10 +35,10 @@ object ExpandTopicsUseCase {
                         )
                     )
             }
-            ChannelsStub.combinedChannels = ChannelsStub.combinedChannels.mapValues {
+            ChannelsStub.allCombinedChannels = ChannelsStub.allCombinedChannels.mapValues {
                 if (it.key == category) newList else it.value
             }
-            return@withContext ChannelsStub.combinedChannels
+            return@withContext ChannelsStub.allCombinedChannels
         }
 
 }

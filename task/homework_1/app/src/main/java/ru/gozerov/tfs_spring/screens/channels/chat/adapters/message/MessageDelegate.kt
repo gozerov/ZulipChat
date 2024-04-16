@@ -3,12 +3,12 @@ package ru.gozerov.tfs_spring.screens.channels.chat.adapters.message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import coil.transform.CircleCropTransformation
 import ru.gozerov.core.AdapterDelegate
 import ru.gozerov.core.DelegateItem
 import ru.gozerov.core.views.MessageCardLayout
-import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.databinding.ItemMessageBinding
 
 class MessageDelegate(
@@ -38,7 +38,10 @@ class MessageDelegate(
             }
             messageCardLayout.addOnEmojiChangedListener {
                 val message = item.content() as MessageModel
-                onReactionChanged(message.id, Reaction(it.emoji, it.count, it.isEmojiSelected))
+                onReactionChanged(
+                    message.id,
+                    Reaction(it.emojiName, it.emojiCode, it.emojiType, it.count, it.isEmojiSelected)
+                )
             }
         }
 
@@ -52,8 +55,9 @@ class MessageDelegate(
                 tag = data
                 username = data.author
                 message = data.message
-                imageDrawable =
-                    ContextCompat.getDrawable(context, R.drawable.ic_launcher_background)
+                /*imageView.load(data.avatarUrl) {
+                    transformations(CircleCropTransformation())
+                }*/
                 addReaction(data.reactions)
             }
         }

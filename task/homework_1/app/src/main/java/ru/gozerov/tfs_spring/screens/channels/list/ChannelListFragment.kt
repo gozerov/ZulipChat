@@ -1,13 +1,13 @@
 package ru.gozerov.tfs_spring.screens.channels.list
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -18,6 +18,7 @@ import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.activity.ToolbarState
 import ru.gozerov.tfs_spring.activity.searchFieldFlow
 import ru.gozerov.tfs_spring.activity.updateToolbar
+import ru.gozerov.tfs_spring.app.TFSApp
 import ru.gozerov.tfs_spring.databinding.FragmentChannelListBinding
 import ru.gozerov.tfs_spring.screens.channels.list.adapters.ChannelPagerAdapter
 import ru.gozerov.tfs_spring.screens.channels.list.adapters.ChannelsAdapter
@@ -31,12 +32,18 @@ class ChannelListFragment : Fragment() {
     private lateinit var binding: FragmentChannelListBinding
 
     private val viewModel: ChannelListViewModel by lazy {
-        ViewModelProvider(this)[ChannelListViewModel::class.java]
+        ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return ChannelListViewModel((requireContext().applicationContext as TFSApp).zulipApi) as T
+            }
+        })[ChannelListViewModel::class.java]
     }
 
-    private val channelsAdapter = ChannelsAdapter()
+    private val subscribedChannelsAdapter = ChannelsAdapter()
+    private val allChannelsAdapter = ChannelsAdapter()
 
-    private val channelPagerAdapter = ChannelPagerAdapter(channelsAdapter)
+    private val channelPagerAdapter =
+        ChannelPagerAdapter(listOf(subscribedChannelsAdapter, allChannelsAdapter))
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,30 +52,32 @@ class ChannelListFragment : Fragment() {
     ): View {
         binding = FragmentChannelListBinding.inflate(inflater, container, false)
         updateToolbar(ToolbarState.Search(getString(R.string.search_and)))
-        channelsAdapter.addDelegate(
-            ChannelDelegate {
-                viewModel.handleIntent(
-                    ChannelListIntent.ExpandItems(
-                        it,
-                        binding.categoryTabs.selectedTabPosition
-                    )
+        val channelDelegate = ChannelDelegate {
+            viewModel.handleIntent(
+                ChannelListIntent.ExpandItems(
+                    it,
+                    binding.categoryTabs.selectedTabPosition
                 )
-            })
-        channelsAdapter.addDelegate(
-            TopicDelegate {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    repeatOnLifecycle(Lifecycle.State.STARTED) {
-                        val channelName = viewModel.getChannelById(it)
-                        val action =
-                            ChannelListFragmentDirections.actionNavChannelsToChatFragment(
-                                id,
-                                channelName
-                            )
-                        findNavController().navigate(action)
-                    }
+            )
+        }
+        val topicDelegate = TopicDelegate {
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    val channelName =
+                        viewModel.getChannelById(it, binding.categoryTabs.selectedTabPosition)
+                    val action =
+                        ChannelListFragmentDirections.actionNavChannelsToChatFragment(
+                            it.title,
+                            channelName
+                        )
+                    findNavController().navigate(action)
                 }
             }
-        )
+        }
+        subscribedChannelsAdapter.addDelegate(channelDelegate)
+        subscribedChannelsAdapter.addDelegate(topicDelegate)
+        allChannelsAdapter.addDelegate(channelDelegate)
+        allChannelsAdapter.addDelegate(topicDelegate)
         return binding.root
     }
 
@@ -79,7 +88,6 @@ class ChannelListFragment : Fragment() {
         binding.channelsViewPager.adapter = channelPagerAdapter
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.handleIntent(ChannelListIntent.LoadChannels)
                 launch {
                     searchFieldFlow.collect {
                         viewModel.handleIntent(
@@ -93,7 +101,10 @@ class ChannelListFragment : Fragment() {
                 launch {
                     viewModel.viewState.collect { state ->
                         when (state) {
-                            is ChannelListViewState.Empty -> {}
+                            is ChannelListViewState.Empty -> {
+                                viewModel.handleIntent(ChannelListIntent.LoadChannels)
+                            }
+
                             is ChannelListViewState.LoadedChannels -> {
                                 binding.shimmerLayout.stopShimmer()
                                 binding.shimmerLayout.visibility = View.GONE

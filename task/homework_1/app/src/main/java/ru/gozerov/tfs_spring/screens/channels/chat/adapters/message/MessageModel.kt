@@ -5,5 +5,6 @@ data class MessageModel(
     val author: String,
     val authorId: Int,
     val message: String,
-    val reactions: List<Reaction>
+    val reactions: List<Reaction>,
+    val avatarUrl: String?
 )
