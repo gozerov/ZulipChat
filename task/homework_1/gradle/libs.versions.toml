@@ -15,6 +15,7 @@ navigation = "2.7.7"
 shimmer-android = "0.5.0"
 retrofit2 = "2.9.0"
 okhttp3 = "4.10.0"
+elmslie = "2.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,11 +38,14 @@ moshi-converter = { group = "com.squareup.retrofit2", name = "converter-moshi", 
 okhttp3-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "okhttp3" }
 okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp" }
 okhttp3-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor" }
+elmslie-core = { group = "com.github.vivid-money.elmslie", name = "elmslie-core", version.ref = "elmslie" }
+elmslie-android = { group = "com.github.vivid-money.elmslie", name = "elmslie-android", version.ref = "elmslie" }
+elmslie-coroutines = { group = "com.github.vivid-money.elmslie", name = "elmslie-coroutines", version.ref = "elmslie" }
 
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-navigation-safe-args = { id = "androidx.navigation.safeargs", version.ref = "navigation" }
+navigation-safe-args = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }
 
 

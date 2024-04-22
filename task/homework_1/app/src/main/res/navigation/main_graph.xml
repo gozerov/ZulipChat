@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_graph"
     app:startDestination="@id/tabsFragment">
 
     <fragment
         android:id="@+id/tabsFragment"
-        android:name="ru.gozerov.tfs_spring.screens.tabs.TabsFragment"
+        android:name="ru.gozerov.tfs_spring.presentation.screens.tabs.TabsFragment"
         android:label="TabsFragment" />
 
 </navigation>

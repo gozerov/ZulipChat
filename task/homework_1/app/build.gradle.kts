@@ -56,5 +56,8 @@ dependencies {
     implementation(libs.okhttp3)
     implementation(libs.okhttp3.logging.interceptor)
 
+    implementation(libs.elmslie.core)
+    implementation(libs.elmslie.android)
+    implementation(libs.elmslie.coroutines)
 
 }
