@@ -1,5 +1,6 @@
 package ru.gozerov.tfs_spring.presentation.screens.contacts.details
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,22 +9,19 @@ import androidx.navigation.fragment.navArgs
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import ru.gozerov.tfs_spring.R
-import ru.gozerov.tfs_spring.app.TFSApp
 import ru.gozerov.tfs_spring.core.utils.dp
 import ru.gozerov.tfs_spring.databinding.FragmentProfileBinding
-import ru.gozerov.tfs_spring.domain.use_cases.GetContactByIdUseCase
+import ru.gozerov.tfs_spring.di.application.appComponent
+import ru.gozerov.tfs_spring.di.features.contacts.details.DaggerContactDetailsComponent
 import ru.gozerov.tfs_spring.presentation.activity.TitleGravity
 import ru.gozerov.tfs_spring.presentation.activity.ToolbarState
 import ru.gozerov.tfs_spring.presentation.activity.updateToolbar
-import ru.gozerov.tfs_spring.presentation.screens.contacts.details.elm.ContactDetailsActor
-import ru.gozerov.tfs_spring.presentation.screens.contacts.details.elm.ContactDetailsReducer
 import ru.gozerov.tfs_spring.presentation.screens.contacts.details.elm.models.ContactDetailsEffect
 import ru.gozerov.tfs_spring.presentation.screens.contacts.details.elm.models.ContactDetailsEvent
 import ru.gozerov.tfs_spring.presentation.screens.contacts.details.elm.models.ContactDetailsState
 import vivid.money.elmslie.android.base.ElmFragment
-import vivid.money.elmslie.android.storeholder.LifecycleAwareStoreHolder
 import vivid.money.elmslie.android.storeholder.StoreHolder
-import vivid.money.elmslie.coroutines.ElmStoreCompat
+import javax.inject.Inject
 
 class ContactDetailsFragment :
     ElmFragment<ContactDetailsEvent, ContactDetailsEffect, ContactDetailsState>() {
@@ -37,18 +35,17 @@ class ContactDetailsFragment :
     }
 
     override val storeHolder: StoreHolder<ContactDetailsEvent, ContactDetailsEffect, ContactDetailsState> by lazy {
-        storeFactory()
+        storeFactory
     }
 
-    private fun storeFactory(): StoreHolder<ContactDetailsEvent, ContactDetailsEffect, ContactDetailsState> {
-        val zulipApi = (requireContext().applicationContext as TFSApp).zulipApi
-        return LifecycleAwareStoreHolder(lifecycle) {
-            ElmStoreCompat(
-                initialState = ContactDetailsState(),
-                reducer = ContactDetailsReducer(),
-                actor = ContactDetailsActor(GetContactByIdUseCase(zulipApi))
-            )
-        }
+    @Inject
+    lateinit var storeFactory: StoreHolder<ContactDetailsEvent, ContactDetailsEffect, ContactDetailsState>
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val component =
+            DaggerContactDetailsComponent.factory().create(lifecycle, context.appComponent)
+        component.inject(this)
     }
 
     override fun onCreateView(

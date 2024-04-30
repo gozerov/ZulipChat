@@ -7,8 +7,9 @@ import ru.gozerov.tfs_spring.domain.use_cases.GetReactionsUseCase
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.dialog.elm.models.SelectEmojiCommand
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.dialog.elm.models.SelectEmojiEvent
 import vivid.money.elmslie.coroutines.Actor
+import javax.inject.Inject
 
-class SelectEmojiActor(
+class SelectEmojiActor @Inject constructor(
     private val getReactionsUseCase: GetReactionsUseCase
 ) : Actor<SelectEmojiCommand, SelectEmojiEvent> {
 

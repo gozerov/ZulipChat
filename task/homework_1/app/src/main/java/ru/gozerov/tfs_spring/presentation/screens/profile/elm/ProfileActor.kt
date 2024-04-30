@@ -7,8 +7,9 @@ import ru.gozerov.tfs_spring.domain.use_cases.GetOwnUserUseCase
 import ru.gozerov.tfs_spring.presentation.screens.profile.elm.models.ProfileCommand
 import ru.gozerov.tfs_spring.presentation.screens.profile.elm.models.ProfileEvent
 import vivid.money.elmslie.coroutines.Actor
+import javax.inject.Inject
 
-class ProfileActor(
+class ProfileActor @Inject constructor(
     private val getOwnUserUseCase: GetOwnUserUseCase
 ) : Actor<ProfileCommand, ProfileEvent> {
 

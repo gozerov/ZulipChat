@@ -1,5 +1,6 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.chat
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,16 +10,10 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import ru.gozerov.tfs_spring.R
-import ru.gozerov.tfs_spring.app.TFSApp
 import ru.gozerov.tfs_spring.core.utils.VerticalMarginItemDecoration
 import ru.gozerov.tfs_spring.databinding.FragmentChatBinding
-import ru.gozerov.tfs_spring.domain.use_cases.AddReactionUseCase
-import ru.gozerov.tfs_spring.domain.use_cases.DeleteEventQueueUseCase
-import ru.gozerov.tfs_spring.domain.use_cases.GetEventsFromQueueUseCase
-import ru.gozerov.tfs_spring.domain.use_cases.GetMessagesUseCase
-import ru.gozerov.tfs_spring.domain.use_cases.RegisterEventQueueUseCase
-import ru.gozerov.tfs_spring.domain.use_cases.RemoveReactionUseCase
-import ru.gozerov.tfs_spring.domain.use_cases.SendMessageUseCase
+import ru.gozerov.tfs_spring.di.application.appComponent
+import ru.gozerov.tfs_spring.di.features.channels.chat.DaggerChatComponent
 import ru.gozerov.tfs_spring.presentation.activity.ToolbarState
 import ru.gozerov.tfs_spring.presentation.activity.updateToolbar
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.MainChatAdapter
@@ -26,15 +21,12 @@ import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.date.Da
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.message.own_message.OwnMessageDelegate
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.message.user_message.UserMessageDelegate
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.dialog.SelectEmojiFragment
-import ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm.ChatActor
-import ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm.ChatReducer
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm.models.ChatEffect
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm.models.ChatEvent
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm.models.ChatState
 import vivid.money.elmslie.android.base.ElmFragment
-import vivid.money.elmslie.android.storeholder.LifecycleAwareStoreHolder
 import vivid.money.elmslie.android.storeholder.StoreHolder
-import vivid.money.elmslie.coroutines.ElmStoreCompat
+import javax.inject.Inject
 
 class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>() {
 
@@ -46,6 +38,19 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>() {
 
     override val initEvent: ChatEvent by lazy {
         ChatEvent.UI.Init(args.channel, args.topic)
+    }
+
+    override val storeHolder: StoreHolder<ChatEvent, ChatEffect, ChatState> by lazy {
+        storeFactory
+    }
+
+    @Inject
+    lateinit var storeFactory: StoreHolder<ChatEvent, ChatEffect, ChatState>
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val component = DaggerChatComponent.factory().create(lifecycle, context.appComponent)
+        component.inject(this)
     }
 
     override fun onCreateView(
@@ -142,31 +147,6 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>() {
     override fun onDestroy() {
         parentFragmentManager.clearFragmentResultListener(SelectEmojiFragment.KEY_RESULT)
         super.onDestroy()
-    }
-
-    override val storeHolder: StoreHolder<ChatEvent, ChatEffect, ChatState> by lazy {
-        storeFactory()
-    }
-
-    private fun storeFactory(): StoreHolder<ChatEvent, ChatEffect, ChatState> {
-        val zulipApi = (requireContext().applicationContext as TFSApp).zulipApi
-        val zulipLongPollingApi =
-            (requireContext().applicationContext as TFSApp).zulipLongPollingApi
-        return LifecycleAwareStoreHolder(lifecycle) {
-            ElmStoreCompat(
-                initialState = ChatState(),
-                reducer = ChatReducer(),
-                actor = ChatActor(
-                    GetMessagesUseCase(zulipApi),
-                    SendMessageUseCase(zulipApi),
-                    RegisterEventQueueUseCase(zulipLongPollingApi),
-                    AddReactionUseCase(zulipApi),
-                    RemoveReactionUseCase(zulipApi),
-                    GetEventsFromQueueUseCase(zulipLongPollingApi),
-                    DeleteEventQueueUseCase(zulipLongPollingApi)
-                )
-            )
-        }
     }
 
     override fun onDetach() {

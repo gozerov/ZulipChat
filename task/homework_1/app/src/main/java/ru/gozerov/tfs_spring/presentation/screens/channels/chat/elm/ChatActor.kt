@@ -15,8 +15,9 @@ import ru.gozerov.tfs_spring.domain.use_cases.SendMessageUseCase
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm.models.ChatCommand
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm.models.ChatEvent
 import vivid.money.elmslie.coroutines.Actor
+import javax.inject.Inject
 
-class ChatActor(
+class ChatActor @Inject constructor(
     private val getMessagesUseCase: GetMessagesUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
     private val registerEventQueueUseCase: RegisterEventQueueUseCase,

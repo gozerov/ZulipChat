@@ -4,14 +4,16 @@ import android.graphics.Color
 import androidx.core.graphics.toColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import ru.gozerov.tfs_spring.data.api.ZulipApi
 import ru.gozerov.tfs_spring.domain.stubs.ChannelsStub
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.channel.ChannelDelegateItem
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.channel.ChannelModel
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.topic.TopicDelegateItem
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.topic.TopicModel
+import javax.inject.Inject
 
-class GetChannelsUseCase(
-    private val zulipApi: ru.gozerov.tfs_spring.data.api.ZulipApi
+class GetChannelsUseCase @Inject constructor(
+    private val zulipApi: ZulipApi
 ) {
 
     suspend operator fun invoke() = withContext(Dispatchers.IO) {

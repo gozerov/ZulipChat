@@ -7,8 +7,9 @@ import ru.gozerov.tfs_spring.domain.use_cases.GetContactByIdUseCase
 import ru.gozerov.tfs_spring.presentation.screens.contacts.details.elm.models.ContactDetailsCommand
 import ru.gozerov.tfs_spring.presentation.screens.contacts.details.elm.models.ContactDetailsEvent
 import vivid.money.elmslie.coroutines.Actor
+import javax.inject.Inject
 
-class ContactDetailsActor(
+class ContactDetailsActor @Inject constructor(
     private val getContactByIdUseCase: GetContactByIdUseCase
 ) : Actor<ContactDetailsCommand, ContactDetailsEvent> {
 

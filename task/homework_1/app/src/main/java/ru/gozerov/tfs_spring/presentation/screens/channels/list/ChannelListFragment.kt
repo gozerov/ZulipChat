@@ -1,5 +1,6 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.list
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,12 +13,9 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import ru.gozerov.tfs_spring.R
-import ru.gozerov.tfs_spring.app.TFSApp
 import ru.gozerov.tfs_spring.databinding.FragmentChannelListBinding
-import ru.gozerov.tfs_spring.domain.use_cases.ExpandTopicsUseCase
-import ru.gozerov.tfs_spring.domain.use_cases.GetChannelByIdUseCase
-import ru.gozerov.tfs_spring.domain.use_cases.GetChannelsUseCase
-import ru.gozerov.tfs_spring.domain.use_cases.SearchChannelsUseCase
+import ru.gozerov.tfs_spring.di.application.appComponent
+import ru.gozerov.tfs_spring.di.features.channels.list.DaggerChannelListComponent
 import ru.gozerov.tfs_spring.presentation.activity.ToolbarState
 import ru.gozerov.tfs_spring.presentation.activity.searchFieldFlow
 import ru.gozerov.tfs_spring.presentation.activity.updateToolbar
@@ -25,15 +23,12 @@ import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.Channel
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.ChannelsAdapter
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.channel.ChannelDelegate
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.topic.TopicDelegate
-import ru.gozerov.tfs_spring.presentation.screens.channels.list.elm.ChannelListActor
-import ru.gozerov.tfs_spring.presentation.screens.channels.list.elm.ChannelListReducer
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.elm.models.ChannelListEffect
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.elm.models.ChannelListEvent
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.elm.models.ChannelListState
 import vivid.money.elmslie.android.base.ElmFragment
-import vivid.money.elmslie.android.storeholder.LifecycleAwareStoreHolder
 import vivid.money.elmslie.android.storeholder.StoreHolder
-import vivid.money.elmslie.coroutines.ElmStoreCompat
+import javax.inject.Inject
 
 class ChannelListFragment : ElmFragment<ChannelListEvent, ChannelListEffect, ChannelListState>() {
 
@@ -48,23 +43,16 @@ class ChannelListFragment : ElmFragment<ChannelListEvent, ChannelListEffect, Cha
     override val initEvent: ChannelListEvent = ChannelListEvent.UI.LoadChannels
 
     override val storeHolder: StoreHolder<ChannelListEvent, ChannelListEffect, ChannelListState> by lazy {
-        storeFactory()
+        storeFactory
     }
 
-    private fun storeFactory(): StoreHolder<ChannelListEvent, ChannelListEffect, ChannelListState> {
-        val zulipApi = (requireContext().applicationContext as TFSApp).zulipApi
-        return LifecycleAwareStoreHolder(lifecycle) {
-            ElmStoreCompat(
-                initialState = ChannelListState(),
-                reducer = ChannelListReducer(),
-                actor = ChannelListActor(
-                    GetChannelsUseCase(zulipApi),
-                    ExpandTopicsUseCase,
-                    SearchChannelsUseCase,
-                    GetChannelByIdUseCase
-                )
-            )
-        }
+    @Inject
+    lateinit var storeFactory: StoreHolder<ChannelListEvent, ChannelListEffect, ChannelListState>
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val component = DaggerChannelListComponent.factory().create(lifecycle, context.appComponent)
+        component.inject(this)
     }
 
     override fun onCreateView(

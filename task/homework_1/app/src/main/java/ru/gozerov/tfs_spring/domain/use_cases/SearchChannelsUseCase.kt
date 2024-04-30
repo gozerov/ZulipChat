@@ -7,8 +7,9 @@ import ru.gozerov.tfs_spring.domain.stubs.ChannelsStub
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.channel.ChannelDelegateItem
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.channel.ChannelModel
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.topic.TopicDelegateItem
+import javax.inject.Inject
 
-object SearchChannelsUseCase {
+class SearchChannelsUseCase @Inject constructor() {
 
     suspend operator fun invoke(request: String): SearchResult =
         withContext(Dispatchers.IO) {
@@ -16,12 +17,12 @@ object SearchChannelsUseCase {
                 ChannelsStub.allCombinedChannels = ChannelsStub.originalAllCombinedChannels
                 return@withContext SearchResult(ChannelsStub.allCombinedChannels)
             } else {
-                val items = ChannelsStub.allCombinedChannels.mapValues { entry ->
+                val items = ChannelsStub.originalAllCombinedChannels.mapValues { entry ->
                     entry.value.filter {
-                        it is ChannelDelegateItem && (it.content() as ChannelModel).title.lowercase()
+                        (it is ChannelDelegateItem && (it.content() as ChannelModel).title.lowercase()
                             .contains(
                                 request.lowercase()
-                            ) || it is TopicDelegateItem
+                            )) || it is TopicDelegateItem
                     }
                 }
                 ChannelsStub.allCombinedChannels = items

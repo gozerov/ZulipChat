@@ -9,8 +9,9 @@ import ru.gozerov.tfs_spring.domain.use_cases.SearchContactsByNameUseCase
 import ru.gozerov.tfs_spring.presentation.screens.contacts.list.elm.models.ContactListCommand
 import ru.gozerov.tfs_spring.presentation.screens.contacts.list.elm.models.ContactListEvent
 import vivid.money.elmslie.coroutines.Actor
+import javax.inject.Inject
 
-class ContactListActor(
+class ContactListActor @Inject constructor(
     private val getContactsUseCase: GetContactsUseCase,
     private val searchContactsByNameUseCase: SearchContactsByNameUseCase
 ) : Actor<ContactListCommand, ContactListEvent> {

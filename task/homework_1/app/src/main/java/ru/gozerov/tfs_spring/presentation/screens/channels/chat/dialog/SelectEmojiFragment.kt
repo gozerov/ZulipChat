@@ -1,5 +1,6 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.chat.dialog
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import ru.gozerov.tfs_spring.core.utils.GridMarginItemDecoration
 import ru.gozerov.tfs_spring.databinding.FragmentSelectEmojiBinding
+import ru.gozerov.tfs_spring.di.application.appComponent
+import ru.gozerov.tfs_spring.di.features.channels.select_emoji.DaggerSelectEmojiComponent
 import ru.gozerov.tfs_spring.domain.use_cases.GetReactionsUseCase
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.dialog.elm.SelectEmojiActor
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.dialog.elm.SelectEmojiReducer
@@ -21,6 +24,7 @@ import vivid.money.elmslie.android.screen.ElmScreen
 import vivid.money.elmslie.android.storeholder.LifecycleAwareStoreHolder
 import vivid.money.elmslie.android.storeholder.StoreHolder
 import vivid.money.elmslie.coroutines.ElmStoreCompat
+import javax.inject.Inject
 
 class SelectEmojiFragment : BottomSheetDialogFragment(),
     ElmDelegate<SelectEmojiEvent, SelectEmojiEffect, SelectEmojiState> {
@@ -36,20 +40,14 @@ class SelectEmojiFragment : BottomSheetDialogFragment(),
     override val initEvent: SelectEmojiEvent = SelectEmojiEvent.UI.LoadEmojiList
 
     override val storeHolder: StoreHolder<SelectEmojiEvent, SelectEmojiEffect, SelectEmojiState> by lazy {
-        storeFactory()
+        storeFactory
     }
 
     @Suppress("LeakingThis", "UnusedPrivateMember")
     private val elm = ElmScreen(this, lifecycle) { requireActivity() }
-    private fun storeFactory(): StoreHolder<SelectEmojiEvent, SelectEmojiEffect, SelectEmojiState> {
-        return LifecycleAwareStoreHolder(lifecycle) {
-            ElmStoreCompat(
-                initialState = SelectEmojiState(),
-                reducer = SelectEmojiReducer(),
-                actor = SelectEmojiActor(GetReactionsUseCase)
-            )
-        }
-    }
+
+    @Inject
+    lateinit var storeFactory: StoreHolder<SelectEmojiEvent, SelectEmojiEffect, SelectEmojiState>
 
     override fun render(state: SelectEmojiState) {
         state.reactions?.run {
@@ -69,6 +67,12 @@ class SelectEmojiFragment : BottomSheetDialogFragment(),
             )
         )
         dismiss()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val component = DaggerSelectEmojiComponent.factory().create(lifecycle, context.appComponent)
+        component.inject(this)
     }
 
     override fun onCreateView(

@@ -4,8 +4,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.gozerov.tfs_spring.data.api.ZulipApi
 import ru.gozerov.tfs_spring.data.api.models.UserContact
+import javax.inject.Inject
 
-class GetContactsUseCase(
+class GetContactsUseCase @Inject constructor(
     private val zulipApi: ZulipApi
 ) {
 

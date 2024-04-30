@@ -16,8 +16,9 @@ import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.message
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.message.user_message.UserMessageModel
 import java.util.Calendar
 import java.util.TimeZone
+import javax.inject.Inject
 
-class GetMessagesUseCase(
+class GetMessagesUseCase @Inject constructor(
     private val zulipApi: ZulipApi
 ) {
 

@@ -5,8 +5,9 @@ import ru.gozerov.tfs_spring.presentation.screens.profile.elm.models.ProfileEffe
 import ru.gozerov.tfs_spring.presentation.screens.profile.elm.models.ProfileEvent
 import ru.gozerov.tfs_spring.presentation.screens.profile.elm.models.ProfileState
 import vivid.money.elmslie.core.store.dsl_reducer.DslReducer
+import javax.inject.Inject
 
-class ProfileReducer : DslReducer<ProfileEvent, ProfileState, ProfileEffect, ProfileCommand>() {
+class ProfileReducer @Inject constructor(): DslReducer<ProfileEvent, ProfileState, ProfileEffect, ProfileCommand>() {
 
     override fun Result.reduce(event: ProfileEvent) = when (event) {
         is ProfileEvent.Internal.SuccessLoadedProfile -> {

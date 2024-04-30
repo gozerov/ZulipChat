@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.navigation.safe.args)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -59,5 +60,8 @@ dependencies {
     implementation(libs.elmslie.core)
     implementation(libs.elmslie.android)
     implementation(libs.elmslie.coroutines)
+
+    implementation(libs.dagger)
+    kapt(libs.dagger.compiler)
 
 }

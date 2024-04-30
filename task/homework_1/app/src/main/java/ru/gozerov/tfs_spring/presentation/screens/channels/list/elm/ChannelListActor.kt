@@ -10,8 +10,9 @@ import ru.gozerov.tfs_spring.domain.use_cases.SearchChannelsUseCase
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.elm.models.ChannelListCommand
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.elm.models.ChannelListEvent
 import vivid.money.elmslie.coroutines.Actor
+import javax.inject.Inject
 
-class ChannelListActor(
+class ChannelListActor @Inject constructor(
     private val getChannelsUseCase: GetChannelsUseCase,
     private val expandTopicsUseCase: ExpandTopicsUseCase,
     private val getSearchResultUseCase: SearchChannelsUseCase,
