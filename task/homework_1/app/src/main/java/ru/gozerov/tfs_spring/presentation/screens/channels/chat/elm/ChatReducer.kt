@@ -1,5 +1,7 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm
 
+import android.util.Log
+import androidx.paging.insertFooterItem
 import androidx.paging.map
 import ru.gozerov.tfs_spring.core.DelegateItem
 import ru.gozerov.tfs_spring.core.utils.getEmojiByUnicode
@@ -90,77 +92,73 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
     // inner logic
 
     private fun Result.addReaction(event: ChatEvent.UI.AddReaction) {
-        state.items?.let { messagesWithDate ->
-            val newItems = messagesWithDate.map { item ->
-                if (((item is UserMessageDelegateItem || item is OwnMessageDelegateItem) && item.id() == event.messageId)) {
-                    if (item is UserMessageDelegateItem) {
-                        val message = item.content() as UserMessageModel
-                        var exists = false
-                        val reactions = message.reactions.map { reaction ->
-                            if (reaction.emojiName == event.emojiName) {
-                                exists = true
-                                if (reaction.isSelected)
-                                    reaction
-                                else {
-                                    commands {
-                                        +ChatCommand.AddReaction(
-                                            event.messageId,
-                                            event.emojiName
-                                        )
-                                    }
-                                    reaction.copy(count = reaction.count + 1, isSelected = true)
-                                }
-                            } else reaction
-                        }.toMutableList()
-                        if (!exists) {
+        val newItems = state.items?.map { item ->
+            if (item is UserMessageDelegateItem && item.id == event.messageId) {
+                val message = item.content() as UserMessageModel
+                var exists = false
+                val reactions = message.reactions.map { reaction ->
+                    if (reaction.emojiName == event.emojiName) {
+                        exists = true
+                        if (reaction.isSelected)
+                            reaction
+                        else {
                             commands {
-                                +ChatCommand.AddReaction(event.messageId, event.emojiName)
+                                +ChatCommand.AddReaction(
+                                    event.messageId,
+                                    event.emojiName
+                                )
                             }
-                            reactions.add(
-                                Reaction(event.emojiName, event.emojiCode, 1, true)
-                            )
+                            reaction.copy(count = reaction.count + 1, isSelected = true)
                         }
-                        UserMessageDelegateItem(
-                            item.id,
-                            message.copy(reactions = reactions.toList())
-                        )
-                    } else {
-                        val message = item.content() as OwnMessageModel
-                        var exists = false
-                        val reactions = message.reactions.map { reaction ->
-                            if (reaction.emojiName == event.emojiName) {
-                                exists = true
-                                if (reaction.isSelected)
-                                    reaction
-                                else {
-                                    commands {
-                                        +ChatCommand.AddReaction(
-                                            event.messageId,
-                                            event.emojiName
-                                        )
-                                    }
-                                    reaction.copy(count = reaction.count + 1, isSelected = true)
-                                }
-                            } else reaction
-                        }.toMutableList()
-                        if (!exists) {
-                            commands {
-                                +ChatCommand.AddReaction(event.messageId, event.emojiName)
-                            }
-                            reactions.add(
-                                Reaction(event.emojiName, event.emojiCode, 1, true)
-                            )
-                        }
-                        OwnMessageDelegateItem(
-                            item.id(),
-                            message.copy(reactions = reactions.toList())
-                        )
+                    } else reaction
+                }.toMutableList()
+                if (!exists) {
+                    commands {
+                        +ChatCommand.AddReaction(event.messageId, event.emojiName)
                     }
-                } else item
+                    reactions.add(
+                        Reaction(event.emojiName, event.emojiCode, 1, true)
+                    )
+                }
+                UserMessageDelegateItem(
+                    item.id,
+                    message.copy(reactions = reactions.toList())
+                )
+            } else if (item is OwnMessageDelegateItem && item.id == event.messageId) {
+                val message = item.content() as OwnMessageModel
+                var exists = false
+                val reactions = message.reactions.map { reaction ->
+                    if (reaction.emojiName == event.emojiName) {
+                        exists = true
+                        if (reaction.isSelected)
+                            reaction
+                        else {
+                            commands {
+                                +ChatCommand.AddReaction(
+                                    event.messageId,
+                                    event.emojiName
+                                )
+                            }
+                            reaction.copy(count = reaction.count + 1, isSelected = true)
+                        }
+                    } else reaction
+                }.toMutableList()
+                if (!exists) {
+                    commands {
+                        +ChatCommand.AddReaction(event.messageId, event.emojiName)
+                    }
+                    reactions.add(
+                        Reaction(event.emojiName, event.emojiCode, 1, true)
+                    )
+                }
+                OwnMessageDelegateItem(
+                    item.id(),
+                    message.copy(reactions = reactions.toList())
+                )
             }
-
-            state { copy(items = newItems, positionToScroll = null) }
+            else item
         }
+            state { copy(items = newItems, positionToScroll = null) }
     }
 
     private fun Result.updateReaction(event: ChatEvent.UI.UpdateReaction) {
@@ -329,9 +327,12 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
                 )
             }
         }
-        state.items?.let {
-           /* val msg = it + messageItems
-            state { copy(items = msg, positionToScroll = msg.size - 1) }
+        state.items?.let { data ->
+            var d = data
+            messageItems.forEach {
+                d = data.insertFooterItem(item = it)
+            }
+            state { copy(items = d, positionToScroll = null) }
             EventQueueData.lastId = lastId
             ChannelsStub.lastDate = lastDate
             commands {
@@ -339,7 +340,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
                     EventQueueData.queueId,
                     lastId
                 )
-            }*/
+            }
         }
     }
 

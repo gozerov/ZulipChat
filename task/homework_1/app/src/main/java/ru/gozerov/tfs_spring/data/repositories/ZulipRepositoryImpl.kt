@@ -1,5 +1,6 @@
 package ru.gozerov.tfs_spring.data.repositories
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import ru.gozerov.tfs_spring.data.cache.dao.StreamDao
@@ -95,6 +96,7 @@ class ZulipRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addReaction(messageId: Int, emojiName: String) {
+        Log.e("AAAA", "adding")
         zulipApi.addReaction(messageId, emojiName)
     }
 

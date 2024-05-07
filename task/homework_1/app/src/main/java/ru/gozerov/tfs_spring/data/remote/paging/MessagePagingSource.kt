@@ -12,6 +12,7 @@ import ru.gozerov.tfs_spring.core.utils.mapMonth
 import ru.gozerov.tfs_spring.data.remote.api.ZulipApi
 import ru.gozerov.tfs_spring.data.remote.api.models.Message
 import ru.gozerov.tfs_spring.data.remote.api.models.MutableReaction
+import ru.gozerov.tfs_spring.domain.stubs.ChannelsStub
 import ru.gozerov.tfs_spring.domain.stubs.UserStub
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.date.DateDelegateItem
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.date.DateModel
@@ -27,18 +28,19 @@ class MessagePagingSource @AssistedInject constructor(
     private val zulipApi: ZulipApi,
     @Assisted("stream") private val streamName: String,
     @Assisted("topic") private val topicName: String
-) : PagingSource<Long, DelegateItem>() {
+) : PagingSource<Int, DelegateItem>() {
 
     private var lastId = INITIAL_PAGE_NUMBER
     private var _lastDate = ""
 
-    override fun getRefreshKey(state: PagingState<Long, DelegateItem>): Long? {
+    override fun getRefreshKey(state: PagingState<Int, DelegateItem>): Int? {
         val anchorPosition = state.anchorPosition ?: return null
         val page = state.closestPageToPosition(anchorPosition) ?: return null
         return page.prevKey?.plus(1) ?: page.nextKey?.minus(1)
     }
 
-    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, DelegateItem> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, DelegateItem> {
+        val page = params.key ?: 1
         val pageSize = params.loadSize
 
         val response = zulipApi.getMessages(
@@ -53,9 +55,10 @@ class MessagePagingSource @AssistedInject constructor(
                     "    }\n" +
                     "]"
         )
+        val prevKey = if (response.messages.size < 20) null else page + 1
+        val nextKey = if (page == 1) null else page - 1
         lastId = response.messages.firstOrNull()?.id?.toLong() ?: 0
-        Log.e("AAAA", response.messages.size.toString())
-        return LoadResult.Page(response.messages.map { UserMessageDelegateItem(it.id, UserMessageModel(it.id, it.sender_full_name, it.sender_id, it.content, listOf(),it.avatar_url)) }, null, null)
+        return LoadResult.Page( mapMessages(response.messages), prevKey, nextKey)
     }
 
     private fun mapMessages(messages: List<Message>): List<DelegateItem> {
@@ -93,7 +96,7 @@ class MessagePagingSource @AssistedInject constructor(
                 )
             if (ind == 0)
                 _lastDate = date
-            if (date != lastDate) {
+            if (date != lastDate && date != _lastDate) {
                 lastDate = date
                 dateCount++
                 messageItems.add(DateDelegateItem(dateCount, DateModel(dateCount, lastDate)))
