@@ -2,15 +2,15 @@ package ru.gozerov.tfs_spring.domain.use_cases
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ru.gozerov.tfs_spring.data.api.ZulipLongPollingApi
+import ru.gozerov.tfs_spring.domain.repositories.ZulipRepository
 import javax.inject.Inject
 
 class RegisterEventQueueUseCase @Inject constructor(
-    private val zulipLongPollingApi: ZulipLongPollingApi
+    private val zulipRepository: ZulipRepository
 ) {
 
     suspend operator fun invoke(topic: String) = withContext(Dispatchers.IO) {
-        return@withContext zulipLongPollingApi.registerEventQueue(
+        return@withContext zulipRepository.registerEventQueue(
             narrow = "[\n" +
                     "   [\"topic\", \"$topic\"]\n" +
                     "]"

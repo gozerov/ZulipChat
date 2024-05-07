@@ -1,14 +1,17 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import ru.gozerov.tfs_spring.core.DelegateItem
 import ru.gozerov.tfs_spring.core.runCatchingNonCancellation
+import ru.gozerov.tfs_spring.data.remote.paging.MessagePagingSource
 import ru.gozerov.tfs_spring.domain.use_cases.AddReactionUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.DeleteEventQueueUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.GetEventsFromQueueUseCase
-import ru.gozerov.tfs_spring.domain.use_cases.GetMessagesUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.RegisterEventQueueUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.RemoveReactionUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.SendMessageUseCase
@@ -18,7 +21,7 @@ import vivid.money.elmslie.coroutines.Actor
 import javax.inject.Inject
 
 class ChatActor @Inject constructor(
-    private val getMessagesUseCase: GetMessagesUseCase,
+    private val messagePagingSourceFactory: MessagePagingSource.Factory,
     private val sendMessageUseCase: SendMessageUseCase,
     private val registerEventQueueUseCase: RegisterEventQueueUseCase,
     private val addReactionUseCase: AddReactionUseCase,
@@ -32,16 +35,27 @@ class ChatActor @Inject constructor(
             when (command) {
                 is ChatCommand.LoadChat ->
                     runCatchingNonCancellation {
-                        getMessagesUseCase.invoke(command.stream, command.topic)
+                        val pager = Pager<Long, DelegateItem>(
+                            config = PagingConfig(
+                                pageSize = 25,
+                                initialLoadSize = 50
+                            )
+                        ) {
+                            messagePagingSourceFactory.create(command.stream, command.topic)
+                        }
+                        return@runCatchingNonCancellation pager.flow
                     }
                         .fold(
-                            onSuccess = {
-                                emit(ChatEvent.Internal.LoadChatSuccess(it))
+                            onSuccess = { flow ->
+                                flow.collect { data ->
+                                    emit(ChatEvent.Internal.LoadChatSuccess(data))
+                                }
                             },
                             onFailure = {
                                 emit(ChatEvent.Internal.LoadChatError)
                             }
                         )
+
 
                 is ChatCommand.RegisterEventQueue -> {
                     runCatchingNonCancellation {
@@ -60,7 +74,7 @@ class ChatActor @Inject constructor(
                                         getEventsFromQueueUseCase.invoke(
                                             it.queue_id,
                                             it.last_event_id
-                                        ).events
+                                        )
                                     emit(ChatEvent.Internal.NewEventsFromQueue(events))
                                 }
                             },
@@ -109,7 +123,7 @@ class ChatActor @Inject constructor(
                         getEventsFromQueueUseCase.invoke(command.queueId, command.lastId)
                     }
                         .map {
-                            emit(ChatEvent.Internal.NewEventsFromQueue(it.events))
+                            emit(ChatEvent.Internal.NewEventsFromQueue(it))
                         }
                         .onFailure {
                             emit(ChatEvent.Internal.LoadChatError)
@@ -118,7 +132,7 @@ class ChatActor @Inject constructor(
 
                 is ChatCommand.Exit -> {
                     runCatchingNonCancellation {
-                        deleteEventQueueUseCase.invoke(ru.gozerov.tfs_spring.data.api.EventQueueData.queueId)
+                        deleteEventQueueUseCase.invoke(ru.gozerov.tfs_spring.data.remote.api.EventQueueData.queueId)
                     }
                         .onFailure {
                             emit(ChatEvent.Internal.LoadChatError)

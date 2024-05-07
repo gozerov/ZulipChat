@@ -1,8 +1,13 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm
 
+import androidx.paging.map
 import ru.gozerov.tfs_spring.core.DelegateItem
 import ru.gozerov.tfs_spring.core.utils.getEmojiByUnicode
 import ru.gozerov.tfs_spring.core.utils.mapMonth
+import ru.gozerov.tfs_spring.data.remote.api.EventQueueData
+import ru.gozerov.tfs_spring.data.remote.api.models.Message
+import ru.gozerov.tfs_spring.data.remote.api.models.MutableReaction
+import ru.gozerov.tfs_spring.data.remote.api.models.ZulipEvent
 import ru.gozerov.tfs_spring.domain.stubs.ChannelsStub
 import ru.gozerov.tfs_spring.domain.stubs.UserStub
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.date.DateDelegateItem
@@ -36,7 +41,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
                 copy(
                     isLoading = false,
                     items = event.items,
-                    positionToScroll = event.items.size - 1
+                    positionToScroll = event.positionToScroll
                 )
             }
         }
@@ -68,8 +73,8 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
         }
 
         is ChatEvent.Internal.RegisteredEventQueue -> {
-            ru.gozerov.tfs_spring.data.api.EventQueueData.lastId = event.lastEventId
-            ru.gozerov.tfs_spring.data.api.EventQueueData.queueId = event.queueId
+            EventQueueData.lastId = event.lastEventId
+            EventQueueData.queueId = event.queueId
             commands { +ChatCommand.GetEventsFromQueue(event.queueId, event.lastEventId) }
         }
 
@@ -247,8 +252,8 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
     }
 
 
-    private fun Result.obtainNewMessages(items: List<ru.gozerov.tfs_spring.data.api.models.ZulipEvent>) {
-        val messages = mutableListOf<ru.gozerov.tfs_spring.data.api.models.Message>()
+    private fun Result.obtainNewMessages(items: List<ZulipEvent>) {
+        val messages = mutableListOf<Message>()
         var lastId = -1
         items.forEach {
             lastId = it.id
@@ -263,7 +268,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
         val messageItems = mutableListOf<DelegateItem>()
         messages.map { message ->
             val reactionCodes =
-                mutableMapOf<String, ru.gozerov.tfs_spring.data.api.models.MutableReaction>()
+                mutableMapOf<String, MutableReaction>()
             message.reactions.forEach { reaction ->
                 val listR = reactionCodes[reaction.emoji_name]
                 listR?.let {
@@ -272,7 +277,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
                         it.isSelected = true
                 } ?: reactionCodes.put(
                     reaction.emoji_name,
-                    ru.gozerov.tfs_spring.data.api.models.MutableReaction(
+                    MutableReaction(
                         reaction.emoji_name,
                         reaction.reaction_type,
                         reaction.emoji_code,
@@ -325,16 +330,16 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
             }
         }
         state.items?.let {
-            val msg = it + messageItems
+           /* val msg = it + messageItems
             state { copy(items = msg, positionToScroll = msg.size - 1) }
-            ru.gozerov.tfs_spring.data.api.EventQueueData.lastId = lastId
+            EventQueueData.lastId = lastId
             ChannelsStub.lastDate = lastDate
             commands {
                 +ChatCommand.GetEventsFromQueue(
-                    ru.gozerov.tfs_spring.data.api.EventQueueData.queueId,
+                    EventQueueData.queueId,
                     lastId
                 )
-            }
+            }*/
         }
     }
 

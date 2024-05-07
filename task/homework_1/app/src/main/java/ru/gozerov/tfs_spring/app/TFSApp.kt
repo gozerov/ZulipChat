@@ -7,7 +7,7 @@ import ru.gozerov.tfs_spring.di.application.DaggerAppComponent
 class TFSApp : Application() {
 
     val applicationComponent: AppComponent by lazy {
-        DaggerAppComponent.builder().build()
+        DaggerAppComponent.factory().create(applicationContext)
     }
 
 }

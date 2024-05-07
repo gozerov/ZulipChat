@@ -1,7 +1,7 @@
 package ru.gozerov.tfs_spring.presentation.screens.contacts.list.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import ru.gozerov.tfs_spring.data.api.models.UserContact
+import ru.gozerov.tfs_spring.data.remote.api.models.UserContact
 
 class ContactsDiffCallback(
     private val oldList: List<UserContact>,

@@ -1,7 +1,8 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm.models
 
+import androidx.paging.PagingData
 import ru.gozerov.tfs_spring.core.DelegateItem
-import ru.gozerov.tfs_spring.data.api.models.ZulipEvent
+import ru.gozerov.tfs_spring.data.remote.api.models.ZulipEvent
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.message.Reaction
 
 sealed interface ChatEvent {
@@ -46,7 +47,7 @@ sealed interface ChatEvent {
     sealed interface Internal : ChatEvent {
 
         data class LoadChatSuccess(
-            val items: List<DelegateItem>,
+            val items: PagingData<DelegateItem>,
             val positionToScroll: Int? = null
         ) : Internal
 

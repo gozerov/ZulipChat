@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.core.utils.VerticalMarginItemDecoration
 import ru.gozerov.tfs_spring.databinding.FragmentChatBinding
@@ -132,9 +134,11 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>() {
     }
 
     override fun render(state: ChatState) {
-        state.items?.run { adapter.submitList(this) }
-        state.positionToScroll?.run {
-            binding.messageList.postDelayed({ binding.messageList.scrollToPosition(this) }, 50)
+        viewLifecycleOwner.lifecycleScope.launch {
+            state.items?.run { adapter.submitData(this) }
+            state.positionToScroll?.run {
+                binding.messageList.postDelayed({ binding.messageList.scrollToPosition(binding.messageList.adapter?.itemCount?.minus(1) ?: 0) }, 50)
+            }
         }
     }
 

@@ -27,8 +27,10 @@ class ChannelListActor @Inject constructor(
                     getChannelsUseCase.invoke()
                 }
                     .fold(
-                        onSuccess = {
-                            emit(ChannelListEvent.Internal.SuccessLoadedChannels(it))
+                        onSuccess = { itemsFlow ->
+                            itemsFlow.collect { items ->
+                                emit(ChannelListEvent.Internal.SuccessLoadedChannels(items))
+                            }
                         },
                         onFailure = {
                             emit(ChannelListEvent.Internal.ErrorLoadedChannels)

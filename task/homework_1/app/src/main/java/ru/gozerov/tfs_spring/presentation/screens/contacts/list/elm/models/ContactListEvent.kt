@@ -1,6 +1,7 @@
 package ru.gozerov.tfs_spring.presentation.screens.contacts.list.elm.models
 
-import ru.gozerov.tfs_spring.data.api.models.UserContact
+import ru.gozerov.tfs_spring.data.remote.api.models.UserContact
+
 
 sealed interface ContactListEvent {
 

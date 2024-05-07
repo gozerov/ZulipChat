@@ -9,8 +9,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import ru.gozerov.tfs_spring.app.BasicAuthData
-import ru.gozerov.tfs_spring.data.api.ZulipApi
-import ru.gozerov.tfs_spring.data.api.ZulipLongPollingApi
+import ru.gozerov.tfs_spring.data.remote.api.ZulipApi
+import ru.gozerov.tfs_spring.data.remote.api.ZulipLongPollingApi
 import ru.gozerov.tfs_spring.di.application.ApiConstants.BASE_URL
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton

@@ -4,7 +4,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.gozerov.tfs_spring.core.DelegateItem
 import ru.gozerov.tfs_spring.core.utils.mapMonth
-import ru.gozerov.tfs_spring.data.api.ZulipApi
+import ru.gozerov.tfs_spring.data.remote.api.models.MutableReaction
+import ru.gozerov.tfs_spring.domain.repositories.ZulipRepository
 import ru.gozerov.tfs_spring.domain.stubs.ChannelsStub
 import ru.gozerov.tfs_spring.domain.stubs.UserStub
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.date.DateDelegateItem
@@ -19,11 +20,11 @@ import java.util.TimeZone
 import javax.inject.Inject
 
 class GetMessagesUseCase @Inject constructor(
-    private val zulipApi: ZulipApi
+    private val zulipRepository: ZulipRepository
 ) {
 
     suspend operator fun invoke(stream: String, topic: String) = withContext(Dispatchers.IO) {
-        val messages = zulipApi.getMessages(
+        val messages = zulipRepository.getMessages(
             100, 100, "newest", "[\n" +
                     "    {\n" +
                     "        \"operator\": \"stream\",\n" +
@@ -34,7 +35,7 @@ class GetMessagesUseCase @Inject constructor(
                     "        \"operand\": \"$topic\"\n" +
                     "    }\n" +
                     "]"
-        ).messages
+        )
         var dateCount = 0
         var lastDate = ""
         val calendar = Calendar.getInstance()
@@ -42,7 +43,7 @@ class GetMessagesUseCase @Inject constructor(
         val messageItems = mutableListOf<DelegateItem>()
         messages.map { message ->
             val reactionCodes =
-                mutableMapOf<String, ru.gozerov.tfs_spring.data.api.models.MutableReaction>()
+                mutableMapOf<String, MutableReaction>()
             message.reactions.forEach { reaction ->
                 val listR = reactionCodes[reaction.emoji_name]
                 listR?.let {
@@ -51,7 +52,7 @@ class GetMessagesUseCase @Inject constructor(
                         it.isSelected = true
                 } ?: reactionCodes.put(
                     reaction.emoji_name,
-                    ru.gozerov.tfs_spring.data.api.models.MutableReaction(
+                    MutableReaction(
                         reaction.emoji_name,
                         reaction.reaction_type,
                         reaction.emoji_code,

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.CircleCropTransformation
 import ru.gozerov.tfs_spring.R
-import ru.gozerov.tfs_spring.data.api.models.UserContact
+import ru.gozerov.tfs_spring.data.remote.api.models.UserContact
 import ru.gozerov.tfs_spring.databinding.ItemContactBinding
 
 class ContactsAdapter(
@@ -27,7 +27,6 @@ class ContactsAdapter(
                 }
                 txtUsername.text = data.username
                 txtEmail.text = data.email
-                Log.e("AAAA", data.isOnline.toString())
                 imgOnline.setBackgroundResource(if (data.isOnline) R.drawable.online_bg else R.drawable.offline_bg)
             }
         }

@@ -2,7 +2,7 @@ package ru.gozerov.tfs_spring.domain.use_cases
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ru.gozerov.tfs_spring.data.api.models.SearchResult
+import ru.gozerov.tfs_spring.data.remote.api.models.SearchResult
 import ru.gozerov.tfs_spring.domain.stubs.ChannelsStub
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.channel.ChannelDelegateItem
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.channel.ChannelModel

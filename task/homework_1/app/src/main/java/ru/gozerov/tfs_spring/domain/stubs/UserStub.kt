@@ -1,6 +1,6 @@
 package ru.gozerov.tfs_spring.domain.stubs
 
-import ru.gozerov.tfs_spring.data.api.models.UserContact
+import ru.gozerov.tfs_spring.data.remote.api.models.UserContact
 
 object UserStub {
 

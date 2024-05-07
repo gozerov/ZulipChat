@@ -1,6 +1,6 @@
 package ru.gozerov.tfs_spring.presentation.screens.contacts.list.elm.models
 
-import ru.gozerov.tfs_spring.data.api.models.UserContact
+import ru.gozerov.tfs_spring.data.remote.api.models.UserContact
 
 data class ContactListState(
     val isLoading: Boolean = false,
