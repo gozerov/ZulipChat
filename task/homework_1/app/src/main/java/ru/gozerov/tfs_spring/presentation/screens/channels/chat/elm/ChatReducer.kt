@@ -1,8 +1,11 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm
 
-import android.util.Log
 import androidx.paging.insertFooterItem
 import androidx.paging.map
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.flowOf
 import ru.gozerov.tfs_spring.core.DelegateItem
 import ru.gozerov.tfs_spring.core.utils.getEmojiByUnicode
 import ru.gozerov.tfs_spring.core.utils.mapMonth
@@ -42,7 +45,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
             state {
                 copy(
                     isLoading = false,
-                    items = event.items,
+                    flowItems = event.items,
                     positionToScroll = event.positionToScroll
                 )
             }
@@ -58,6 +61,10 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
             commands { +ChatCommand.LoadChat(event.stream, event.topic) }
         }
 
+        is ChatEvent.UI.SaveMessages -> {
+            state { copy(flowItems = null, items = event.data) }
+        }
+
         is ChatEvent.UI.SendMessage -> {
             commands { +ChatCommand.SendMessage(event.channel, event.topic, event.content) }
         }
@@ -67,10 +74,19 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
         }
 
         is ChatEvent.UI.AddReaction -> {
+            commands {
+                +ChatCommand.AddReaction(event.messageId, event.emojiName)
+            }
             addReaction(event)
         }
 
         is ChatEvent.UI.UpdateReaction -> {
+            commands {
+                if (event.reaction.isSelected)
+                    +ChatCommand.RemoveReaction(event.messageId, event.reaction.emojiName)
+                else
+                    +ChatCommand.AddReaction(event.messageId, event.reaction.emojiName)
+            }
             updateReaction(event)
         }
 
@@ -102,20 +118,11 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
                         if (reaction.isSelected)
                             reaction
                         else {
-                            commands {
-                                +ChatCommand.AddReaction(
-                                    event.messageId,
-                                    event.emojiName
-                                )
-                            }
                             reaction.copy(count = reaction.count + 1, isSelected = true)
                         }
                     } else reaction
                 }.toMutableList()
                 if (!exists) {
-                    commands {
-                        +ChatCommand.AddReaction(event.messageId, event.emojiName)
-                    }
                     reactions.add(
                         Reaction(event.emojiName, event.emojiCode, 1, true)
                     )
@@ -133,20 +140,12 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
                         if (reaction.isSelected)
                             reaction
                         else {
-                            commands {
-                                +ChatCommand.AddReaction(
-                                    event.messageId,
-                                    event.emojiName
-                                )
-                            }
                             reaction.copy(count = reaction.count + 1, isSelected = true)
                         }
                     } else reaction
                 }.toMutableList()
                 if (!exists) {
-                    commands {
-                        +ChatCommand.AddReaction(event.messageId, event.emojiName)
-                    }
+
                     reactions.add(
                         Reaction(event.emojiName, event.emojiCode, 1, true)
                     )
@@ -155,10 +154,11 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
                     item.id(),
                     message.copy(reactions = reactions.toList())
                 )
-            }
-            else item
+            } else item
         }
-            state { copy(items = newItems, positionToScroll = null) }
+        newItems?.let {
+            state { copy(flowItems = flowOf(newItems), items = newItems, positionToScroll = null) }
+        }
     }
 
     private fun Result.updateReaction(event: ChatEvent.UI.UpdateReaction) {
@@ -170,31 +170,13 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
                         val reactions = message.reactions.mapNotNull { reaction ->
                             if (reaction.emojiName == event.reaction.emojiName) {
                                 if (reaction.count == 1 && reaction.isSelected) {
-                                    commands {
-                                        +ChatCommand.RemoveReaction(
-                                            event.messageId,
-                                            event.reaction.emojiName
-                                        )
-                                    }
                                     null
                                 } else if (reaction.isSelected) {
-                                    commands {
-                                        +ChatCommand.RemoveReaction(
-                                            event.messageId,
-                                            event.reaction.emojiName
-                                        )
-                                    }
                                     reaction.copy(
                                         count = event.reaction.count - 1,
                                         isSelected = !event.reaction.isSelected
                                     )
                                 } else {
-                                    commands {
-                                        +ChatCommand.AddReaction(
-                                            event.messageId,
-                                            event.reaction.emojiName
-                                        )
-                                    }
                                     reaction.copy(
                                         count = event.reaction.count + 1,
                                         isSelected = !event.reaction.isSelected
@@ -208,31 +190,13 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
                         val reactions = message.reactions.mapNotNull { reaction ->
                             if (reaction.emojiName == event.reaction.emojiName) {
                                 if (reaction.count == 1 && reaction.isSelected) {
-                                    commands {
-                                        +ChatCommand.RemoveReaction(
-                                            event.messageId,
-                                            event.reaction.emojiName
-                                        )
-                                    }
                                     null
                                 } else if (reaction.isSelected) {
-                                    commands {
-                                        +ChatCommand.RemoveReaction(
-                                            event.messageId,
-                                            event.reaction.emojiName
-                                        )
-                                    }
                                     reaction.copy(
                                         count = event.reaction.count - 1,
                                         isSelected = !event.reaction.isSelected
                                     )
                                 } else {
-                                    commands {
-                                        +ChatCommand.AddReaction(
-                                            event.messageId,
-                                            event.reaction.emojiName
-                                        )
-                                    }
                                     reaction.copy(
                                         count = event.reaction.count + 1,
                                         isSelected = !event.reaction.isSelected
@@ -245,7 +209,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
 
                 } else it
             }
-            state { copy(items = newItems, positionToScroll = null) }
+            state { copy(flowItems = flowOf(newItems), items = newItems, positionToScroll = null) }
         }
     }
 
@@ -328,19 +292,19 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
             }
         }
         state.items?.let { data ->
-            var d = data
+            var newData = data
             messageItems.forEach {
-                d = data.insertFooterItem(item = it)
+                newData = data.insertFooterItem(item = it)
             }
-            state { copy(items = d, positionToScroll = null) }
+            state { copy(items = newData, flowItems = flowOf(newData), positionToScroll = null) }
             EventQueueData.lastId = lastId
             ChannelsStub.lastDate = lastDate
-            commands {
-                +ChatCommand.GetEventsFromQueue(
-                    EventQueueData.queueId,
-                    lastId
-                )
-            }
+        }
+        commands {
+            +ChatCommand.GetEventsFromQueue(
+                EventQueueData.queueId,
+                lastId
+            )
         }
     }
 

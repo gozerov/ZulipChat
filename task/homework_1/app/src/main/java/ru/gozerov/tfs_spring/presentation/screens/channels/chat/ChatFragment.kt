@@ -8,14 +8,17 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.paging.cachedIn
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.core.utils.VerticalMarginItemDecoration
 import ru.gozerov.tfs_spring.databinding.FragmentChatBinding
 import ru.gozerov.tfs_spring.di.application.appComponent
 import ru.gozerov.tfs_spring.di.features.channels.chat.DaggerChatComponent
+import ru.gozerov.tfs_spring.domain.stubs.ChannelsStub
 import ru.gozerov.tfs_spring.presentation.activity.ToolbarState
 import ru.gozerov.tfs_spring.presentation.activity.updateToolbar
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.MainChatAdapter
@@ -135,9 +138,18 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>() {
 
     override fun render(state: ChatState) {
         viewLifecycleOwner.lifecycleScope.launch {
-            state.items?.run { adapter.submitData(this) }
+            state.flowItems?.cachedIn(this)?.collectLatest {
+                store.accept(ChatEvent.UI.SaveMessages(it))
+                adapter.submitData(it)
+            }
             state.positionToScroll?.run {
-                binding.messageList.postDelayed({ binding.messageList.scrollToPosition(binding.messageList.adapter?.itemCount?.minus(1) ?: 0) }, 50)
+                binding.messageList.postDelayed({
+                    binding.messageList.scrollToPosition(
+                        binding.messageList.adapter?.itemCount?.minus(
+                            1
+                        ) ?: 0
+                    )
+                }, 50)
             }
         }
     }
