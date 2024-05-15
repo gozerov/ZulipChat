@@ -1,5 +1,6 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.list.elm.models
 
+import androidx.navigation.NavController
 import ru.gozerov.tfs_spring.core.DelegateItem
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.channel.ChannelModel
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.topic.TopicModel

@@ -1,6 +1,7 @@
 package ru.gozerov.tfs_spring.di.features.channels.list
 
 import androidx.lifecycle.Lifecycle
+import androidx.navigation.NavController
 import dagger.BindsInstance
 import dagger.Component
 import ru.gozerov.tfs_spring.di.application.AppComponent
@@ -21,6 +22,7 @@ interface ChannelListComponent {
 
         fun create(
             @BindsInstance lifecycle: Lifecycle,
+            @BindsInstance navController: NavController,
             appComponent: AppComponent
         ): ChannelListComponent
 

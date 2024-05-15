@@ -10,5 +10,6 @@ data class ReactionEntity(
     @PrimaryKey @ColumnInfo(name = "emoji_name") val emojiName: String,
     @ColumnInfo(name = "emoji_code") val emojiCode: String,
     val count: Int,
-    @ColumnInfo(name = "is_selected") val isSelected: Boolean
+    @ColumnInfo(name = "is_selected") val isSelected: Boolean,
+    @ColumnInfo(name = "user_id") val userId: Int
 )

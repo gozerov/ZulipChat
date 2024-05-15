@@ -9,6 +9,9 @@ import dagger.assisted.AssistedInject
 import ru.gozerov.tfs_spring.core.DelegateItem
 import ru.gozerov.tfs_spring.core.utils.getEmojiByUnicode
 import ru.gozerov.tfs_spring.core.utils.mapMonth
+import ru.gozerov.tfs_spring.data.cache.dao.MessageDao
+import ru.gozerov.tfs_spring.data.cache.entities.toMessage
+import ru.gozerov.tfs_spring.data.cache.entities.toMessageEntity
 import ru.gozerov.tfs_spring.data.remote.api.ZulipApi
 import ru.gozerov.tfs_spring.data.remote.api.models.Message
 import ru.gozerov.tfs_spring.data.remote.api.models.MutableReaction
@@ -26,12 +29,15 @@ import java.util.TimeZone
 
 class MessagePagingSource @AssistedInject constructor(
     private val zulipApi: ZulipApi,
+    private val messageDao: MessageDao,
     @Assisted("stream") private val streamName: String,
-    @Assisted("topic") private val topicName: String
+    @Assisted("topic") private val topicName: String,
+    @Assisted("fromCache") private val fromCache: Boolean
 ) : PagingSource<Int, DelegateItem>() {
 
     private var lastId = INITIAL_PAGE_NUMBER
     private var _lastDate = ""
+    private var loadedFromCache: Boolean = false
 
     override fun getRefreshKey(state: PagingState<Int, DelegateItem>): Int? {
         val anchorPosition = state.anchorPosition ?: return null
@@ -42,7 +48,20 @@ class MessagePagingSource @AssistedInject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, DelegateItem> {
         val page = params.key ?: 1
         val pageSize = params.loadSize
-
+        if (params.key == null && fromCache) {
+            val savedMessages = messageDao.getMessages(streamName, topicName)
+            if (savedMessages.isNotEmpty()) {
+                loadedFromCache = true
+                ChannelsStub.fromCache = true
+                return LoadResult.Page(
+                    mapMessages(savedMessages.map { it.toMessage(listOf()) }),
+                    0,
+                    null,
+                    0,
+                    0
+                )
+            }
+        }
         val response = zulipApi.getMessages(
             pageSize, 0, lastId.toString(), "[\n" +
                     "    {\n" +
@@ -58,7 +77,13 @@ class MessagePagingSource @AssistedInject constructor(
         val prevKey = if (response.messages.size < 20) null else page + 1
         val nextKey = if (page == 1) null else page - 1
         lastId = response.messages.firstOrNull()?.id?.toLong() ?: 0
-        return LoadResult.Page( mapMessages(response.messages), prevKey, nextKey)
+        if (page == 1) {
+            messageDao.clear(streamName, topicName)
+            messageDao.saveMessages(response.messages.map { it.toMessageEntity(streamName, topicName) })
+            return LoadResult.Page(mapMessages(response.messages), prevKey, nextKey, 0, 0)
+        }
+
+        return LoadResult.Page(mapMessages(response.messages), prevKey, nextKey)
     }
 
     private fun mapMessages(messages: List<Message>): List<DelegateItem> {
@@ -132,7 +157,7 @@ class MessagePagingSource @AssistedInject constructor(
                 )
             }
         }
-       // _lastDate = lastDate
+        // _lastDate = lastDate
         Log.e("AAAA", messageItems.size.toString())
         return messageItems
     }
@@ -142,7 +167,8 @@ class MessagePagingSource @AssistedInject constructor(
 
         fun create(
             @Assisted("stream") streamName: String,
-            @Assisted("topic") topicName: String
+            @Assisted("topic") topicName: String,
+            @Assisted("fromCache") fromCache: Boolean
         ): MessagePagingSource
 
     }

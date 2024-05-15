@@ -2,9 +2,6 @@ package ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm
 
 import androidx.paging.insertFooterItem
 import androidx.paging.map
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.flowOf
 import ru.gozerov.tfs_spring.core.DelegateItem
 import ru.gozerov.tfs_spring.core.utils.getEmojiByUnicode
@@ -36,7 +33,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
         is ChatEvent.UI.Init -> {
             state { copy(isLoading = true) }
             commands {
-                +ChatCommand.LoadChat(event.stream, event.topic)
+                +ChatCommand.LoadChat(event.stream, event.topic, event.fromCache)
                 +ChatCommand.RegisterEventQueue(event.topic)
             }
         }
@@ -45,6 +42,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
             state {
                 copy(
                     isLoading = false,
+                    fromCache = event.fromCache,
                     flowItems = event.items,
                     positionToScroll = event.positionToScroll
                 )
@@ -58,7 +56,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
 
         is ChatEvent.UI.LoadMessages -> {
             state { copy(isLoading = true) }
-            commands { +ChatCommand.LoadChat(event.stream, event.topic) }
+            commands { +ChatCommand.LoadChat(event.stream, event.topic, event.fromCache) }
         }
 
         is ChatEvent.UI.SaveMessages -> {

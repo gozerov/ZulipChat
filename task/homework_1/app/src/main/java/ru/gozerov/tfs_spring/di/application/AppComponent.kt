@@ -4,7 +4,8 @@ import android.content.Context
 import dagger.BindsInstance
 import dagger.Component
 import ru.gozerov.tfs_spring.app.TFSApp
-import ru.gozerov.tfs_spring.data.cache.dao.StreamDao
+import ru.gozerov.tfs_spring.data.cache.AppDatabase
+import ru.gozerov.tfs_spring.data.cache.dao.MessageDao
 import ru.gozerov.tfs_spring.data.remote.api.ZulipApi
 import ru.gozerov.tfs_spring.data.remote.api.ZulipLongPollingApi
 import ru.gozerov.tfs_spring.domain.repositories.ZulipRepository
@@ -17,6 +18,9 @@ interface AppComponent {
     val zulipRepository: ZulipRepository
     val zulipApi: ZulipApi
     val zulipLongPollingApi: ZulipLongPollingApi
+
+    val appDatabase: AppDatabase
+    val messageDao: MessageDao
 
     @Component.Factory
     interface Factory {

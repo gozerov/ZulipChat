@@ -1,12 +1,19 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.list.elm
 
+import android.os.Handler
+import android.os.Looper
+import androidx.navigation.NavController
+import ru.gozerov.tfs_spring.presentation.screens.channels.list.ChannelListFragmentDirections
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.elm.models.ChannelListCommand
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.elm.models.ChannelListEffect
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.elm.models.ChannelListEvent
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.elm.models.ChannelListState
 import vivid.money.elmslie.core.store.dsl_reducer.DslReducer
+import javax.inject.Inject
 
-class ChannelListReducer :
+class ChannelListReducer @Inject constructor(
+    private val navController: NavController
+) :
     DslReducer<ChannelListEvent, ChannelListState, ChannelListEffect, ChannelListCommand>() {
 
     override fun Result.reduce(event: ChannelListEvent) = when (event) {
@@ -20,7 +27,15 @@ class ChannelListReducer :
         }
 
         is ChannelListEvent.Internal.SuccessLoadedChannel -> {
-            effects { +ChannelListEffect.LoadedChannel(event.topic, event.channelName) }
+            val action =
+                ChannelListFragmentDirections.actionNavChannelsToChatFragment(
+                    event.topic,
+                    event.channelName
+                )
+            Handler(Looper.getMainLooper()).post {
+                navController.navigate(action)
+            }
+            Unit
         }
 
         is ChannelListEvent.UI.LoadChannels -> {

@@ -79,7 +79,9 @@ class ChannelListActor @Inject constructor(
                                 )
                             )
                         },
-                        onFailure = { }
+                        onFailure = {
+                            emit(ChannelListEvent.Internal.ErrorLoadedChannels)
+                        }
                     )
             }
         }

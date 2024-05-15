@@ -15,19 +15,14 @@ class RoomModule {
 
     @Singleton
     @Provides
-    fun provideMessageReactionDao(context: Context) =
-        AppDatabase.getInstance(context).getMessageReactionDao()
-
-    @Singleton
-    @Provides
-    fun provideReactionDao(context: Context) = AppDatabase.getInstance(context).getReactionDao()
-
-    @Singleton
-    @Provides
     fun provideStreamDao(context: Context) = AppDatabase.getInstance(context).getStreamDao()
 
     @Singleton
     @Provides
     fun provideTopicDao(context: Context) = AppDatabase.getInstance(context).getTopicDao()
+
+    @Singleton
+    @Provides
+    fun provideAppDatabase(context: Context) = AppDatabase.getInstance(context)
 
 }

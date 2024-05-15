@@ -2,6 +2,7 @@ package ru.gozerov.tfs_spring.presentation.screens.channels.list
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,7 +52,7 @@ class ChannelListFragment : ElmFragment<ChannelListEvent, ChannelListEffect, Cha
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        val component = DaggerChannelListComponent.factory().create(lifecycle, context.appComponent)
+        val component = DaggerChannelListComponent.factory().create(lifecycle, findNavController(), context.appComponent)
         component.inject(this)
     }
 
@@ -72,10 +73,7 @@ class ChannelListFragment : ElmFragment<ChannelListEvent, ChannelListEffect, Cha
         }
         val topicDelegate = TopicDelegate {
             storeHolder.store.accept(
-                ChannelListEvent.UI.LoadChannel(
-                    it,
-                    binding.categoryTabs.selectedTabPosition
-                )
+                ChannelListEvent.UI.LoadChannel(it, binding.categoryTabs.selectedTabPosition)
             )
         }
 
@@ -113,17 +111,14 @@ class ChannelListFragment : ElmFragment<ChannelListEvent, ChannelListEffect, Cha
     }
 
     override fun handleEffect(effect: ChannelListEffect) = when (effect) {
+
         is ChannelListEffect.ShowError -> {
             Toast.makeText(requireContext(), "error", Toast.LENGTH_SHORT).show()
         }
 
         is ChannelListEffect.LoadedChannel -> {
-            val action =
-                ChannelListFragmentDirections.actionNavChannelsToChatFragment(
-                    effect.title,
-                    effect.channelName
-                )
-            findNavController().navigate(action)
+            Log.e("TTTTT", "navigating")
+            Unit
         }
     }
 

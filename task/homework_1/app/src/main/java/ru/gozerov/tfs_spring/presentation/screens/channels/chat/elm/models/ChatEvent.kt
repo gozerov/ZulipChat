@@ -12,7 +12,8 @@ sealed interface ChatEvent {
 
         class Init(
             val stream: String,
-            val topic: String
+            val topic: String,
+            val fromCache: Boolean = true
         ) : UI
 
         class RegisterEventQueue(
@@ -21,7 +22,8 @@ sealed interface ChatEvent {
 
         class LoadMessages(
             val stream: String,
-            val topic: String
+            val topic: String,
+            val fromCache: Boolean = false
         ) : UI
 
         class SaveMessages(
@@ -53,6 +55,7 @@ sealed interface ChatEvent {
 
         data class LoadChatSuccess(
             val items: Flow<PagingData<DelegateItem>>,
+            val fromCache: Boolean,
             val positionToScroll: Int? = null
         ) : Internal
 

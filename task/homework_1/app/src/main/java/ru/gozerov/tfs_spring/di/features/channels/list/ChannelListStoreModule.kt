@@ -22,13 +22,15 @@ interface ChannelListStoreModule {
         @Provides
         fun provideChannelListStore(
             lifecycle: Lifecycle,
-            chatActor: ChannelListActor
+            actor: ChannelListActor,
+            reducer: ChannelListReducer
+
         ): StoreHolder<ChannelListEvent, ChannelListEffect, ChannelListState> =
             LifecycleAwareStoreHolder(lifecycle) {
                 ElmStoreCompat(
                     initialState = ChannelListState(),
-                    reducer = ChannelListReducer(),
-                    actor = chatActor
+                    reducer = reducer,
+                    actor = actor
                 )
             }
 

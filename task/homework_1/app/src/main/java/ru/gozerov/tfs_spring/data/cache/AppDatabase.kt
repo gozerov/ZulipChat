@@ -5,8 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import ru.gozerov.tfs_spring.data.cache.dao.MessageDao
-import ru.gozerov.tfs_spring.data.cache.dao.MessageReactionDao
-import ru.gozerov.tfs_spring.data.cache.dao.ReactionDao
 import ru.gozerov.tfs_spring.data.cache.dao.StreamDao
 import ru.gozerov.tfs_spring.data.cache.dao.TopicDao
 import ru.gozerov.tfs_spring.data.cache.entities.MessageEntity
@@ -28,8 +26,6 @@ import ru.gozerov.tfs_spring.data.cache.entities.TopicEntity
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun getMessageDao(): MessageDao
-    abstract fun getMessageReactionDao(): MessageReactionDao
-    abstract fun getReactionDao(): ReactionDao
     abstract fun getStreamDao(): StreamDao
     abstract fun getTopicDao(): TopicDao
 

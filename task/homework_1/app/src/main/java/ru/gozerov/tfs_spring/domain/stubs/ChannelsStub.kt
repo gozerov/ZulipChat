@@ -11,4 +11,7 @@ object ChannelsStub {
 
     var lastDate = ""
 
+    var fromCache: Boolean? = false
+
+
 }

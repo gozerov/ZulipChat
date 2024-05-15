@@ -4,7 +4,8 @@ sealed interface ChatCommand {
 
     class LoadChat(
         val stream: String,
-        val topic: String
+        val topic: String,
+        val fromCache: Boolean
     ) : ChatCommand
 
     class SendMessage(

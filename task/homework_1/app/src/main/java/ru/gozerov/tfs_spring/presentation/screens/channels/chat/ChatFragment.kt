@@ -2,6 +2,7 @@ package ru.gozerov.tfs_spring.presentation.screens.channels.chat
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -139,6 +140,8 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>() {
     override fun render(state: ChatState) {
         viewLifecycleOwner.lifecycleScope.launch {
             state.flowItems?.cachedIn(this)?.collectLatest {
+                if (state.fromCache)
+                    store.accept(ChatEvent.UI.Init(args.channel, args.topic, false))
                 store.accept(ChatEvent.UI.SaveMessages(it))
                 adapter.submitData(it)
             }

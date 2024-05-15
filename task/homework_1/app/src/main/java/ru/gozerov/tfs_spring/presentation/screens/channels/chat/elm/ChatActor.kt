@@ -1,5 +1,6 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import kotlinx.coroutines.Dispatchers
@@ -10,7 +11,9 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import ru.gozerov.tfs_spring.core.DelegateItem
 import ru.gozerov.tfs_spring.core.runCatchingNonCancellation
+import ru.gozerov.tfs_spring.data.cache.dao.MessageDao
 import ru.gozerov.tfs_spring.data.remote.paging.MessagePagingSource
+import ru.gozerov.tfs_spring.domain.stubs.ChannelsStub
 import ru.gozerov.tfs_spring.domain.use_cases.AddReactionUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.DeleteEventQueueUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.GetEventsFromQueueUseCase
@@ -23,6 +26,7 @@ import vivid.money.elmslie.coroutines.Actor
 import javax.inject.Inject
 
 class ChatActor @Inject constructor(
+    private val messageDao: MessageDao,
     private val messagePagingSourceFactory: MessagePagingSource.Factory,
     private val sendMessageUseCase: SendMessageUseCase,
     private val registerEventQueueUseCase: RegisterEventQueueUseCase,
@@ -32,11 +36,15 @@ class ChatActor @Inject constructor(
     private val deleteEventQueueUseCase: DeleteEventQueueUseCase
 ) : Actor<ChatCommand, ChatEvent> {
 
+    private var pagingSource: MessagePagingSource? = null
+
+    @OptIn(ExperimentalPagingApi::class)
     override fun execute(command: ChatCommand): Flow<ChatEvent> =
         flow {
 
             when (command) {
                 is ChatCommand.LoadChat -> {
+                    pagingSource = messagePagingSourceFactory.create(command.stream, command.topic, command.fromCache)
                     runCatchingNonCancellation {
                         val pager = Pager<Int, DelegateItem>(
                             config = PagingConfig(
@@ -44,14 +52,13 @@ class ChatActor @Inject constructor(
                                 initialLoadSize = 50
                             )
                         ) {
-                            messagePagingSourceFactory.create(command.stream, command.topic)
+                            pagingSource!!
                         }
                         return@runCatchingNonCancellation pager.flow
                     }
                         .fold(
                             onSuccess = { flow ->
-                                emit(ChatEvent.Internal.LoadChatSuccess(flow))
-
+                                emit(ChatEvent.Internal.LoadChatSuccess(flow, command.fromCache))
                             },
                             onFailure = {
                                 emit(ChatEvent.Internal.LoadChatError)
