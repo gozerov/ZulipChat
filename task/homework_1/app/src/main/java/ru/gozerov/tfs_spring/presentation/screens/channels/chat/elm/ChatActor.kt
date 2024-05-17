@@ -132,9 +132,7 @@ class ChatActor @Inject constructor(
                         .map {
                             emit(ChatEvent.Internal.NewEventsFromQueue(it))
                         }
-                        .onFailure {
-                            emit(ChatEvent.Internal.LoadChatError)
-                        }
+                        .onFailure { }
                 }
 
                 is ChatCommand.Exit -> {

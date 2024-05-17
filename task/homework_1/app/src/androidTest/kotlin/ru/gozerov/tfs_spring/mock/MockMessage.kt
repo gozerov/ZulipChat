@@ -11,19 +11,41 @@ class MockMessage(
     private val wireMockServer: WireMockServer
 ) {
 
-    private val matcher = WireMock.get(urlPattern)
+    private val messagesMatcher = WireMock.get(messagesUrlPattern)
+    private val sendMessageMatcher = WireMock.post(messagesUrlPattern)
+    private val registerEventQueueMatcher = WireMock.post(eventQueueUrlPattern)
+    private val eventsMatcher = WireMock.get(eventsPattern)
+    private val deleteEventQueueMatcher = WireMock.delete(eventsPattern)
 
     fun withMessages() {
-        wireMockServer.stubFor(matcher.willReturn(ok(fromAssets("message/messages.json"))))
+        wireMockServer.stubFor(messagesMatcher.willReturn(ok(fromAssets("messages/messages.json"))))
     }
 
-    fun withEmptyList() {
-        wireMockServer.stubFor(matcher.willReturn(ok("[]")))
+    fun withEvents() {
+        wireMockServer.stubFor(eventsMatcher.willReturn(ok(fromAssets("messages/heartbeat.json"))))
+    }
+
+    fun withSendEvent() {
+        wireMockServer.stubFor(sendMessageMatcher.willReturn(ok()))
+    }
+
+    fun withDeleteQueueEvent() {
+        wireMockServer.stubFor(deleteEventQueueMatcher.willReturn(ok()))
+    }
+
+    fun withMessageEvent() {
+        wireMockServer.stubFor(eventsMatcher.willReturn(ok(fromAssets("messages/messageEvent.json"))))
+    }
+
+    fun withRegisteredEventQueue() {
+        wireMockServer.stubFor(registerEventQueueMatcher.willReturn(ok(fromAssets("messages/registeredEventQueue.json"))))
     }
 
     companion object {
 
-        val urlPattern = urlPathMatching("/message/.+")
+        val messagesUrlPattern = urlPathMatching("/messages")
+        val eventQueueUrlPattern = urlPathMatching("/register")
+        val eventsPattern = urlPathMatching("/events")
 
         fun WireMockServer.message(block: MockMessage.() -> Unit) {
             MockMessage(this).apply(block)

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="ru.gozerov.tfs_spring.core.views.UserMessageCardLayout">
+
+    <TextView
+        android:id="@+id/txtDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/txtUserMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ru.gozerov.tfs_spring.core.views.FlexBoxLayout
+        android:id="@+id/emojiLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</merge>

@@ -13,16 +13,19 @@ import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
+import ru.gozerov.tfs_spring.di.application.AppComponent
+import ru.gozerov.tfs_spring.presentation.activity.MainActivity
 
 class AppTestRule<T : Fragment>(
     private val configuration: Application.() -> Unit
 ) : TestRule {
 
-    val wiremockRule = WireMockRule() // default: localhost:8080
-    private val intentsRule = IntentsRule()
+    val activityScenarioRule = ActivityScenarioRule(MainActivity::class.java)
+
+    val wiremockRule = WireMockRule(8080) // default: localhost:8080
 
     override fun apply(base: Statement?, description: Description?): Statement {
-        return RuleChain.outerRule(intentsRule)
+        return RuleChain.outerRule(activityScenarioRule)
             .around(wiremockRule)
             .apply { configuration(ApplicationProvider.getApplicationContext()) }
             .apply(base, description)

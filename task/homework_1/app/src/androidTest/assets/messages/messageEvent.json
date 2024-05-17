@@ -1,0 +1,18 @@
+{
+  "events": [
+    {
+      "type": "message",
+      "message": {
+        "id": 439281906,
+        "sender_id": 709831,
+        "content": "content",
+        "timestamp": 1715974708,
+        "is_me_message": false,
+        "reactions": [],
+        "sender_full_name": "Grigory",
+        "avatar_url": "https://secure.gravatar.com/avatar/1bed50e95be4d09ce0f3b22837f14b63?d=identicon&version=1"
+      },
+      "id": 0
+    }
+  ]
+}

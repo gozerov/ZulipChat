@@ -22,13 +22,10 @@ class UserMessageCardLayout @JvmOverloads constructor(
 ) : ViewGroup(context, attributeSet, defStyle, defTheme) {
 
     private val dateTextView: TextView
-        get() = getChildAt(0) as TextView
 
     private val messageTextView: TextView
-        get() = getChildAt(1) as TextView
 
     private val emojiLayout: FlexBoxLayout
-        get() = getChildAt(2) as FlexBoxLayout
 
     var message = ""
         set(value) {
@@ -50,7 +47,7 @@ class UserMessageCardLayout @JvmOverloads constructor(
             }
         }
 
-    private val defaultMargin = 8f.dp(context).toInt()
+    private var defaultMargin = 8f.dp(context).toInt()
     private val backgroundPaint = Paint().apply {
         style = Paint.Style.FILL
         this.setColor(context.getColor(R.color.teal_400))
@@ -58,15 +55,30 @@ class UserMessageCardLayout @JvmOverloads constructor(
 
     init {
         setWillNotDraw(false)
+        inflate(context, R.layout.layout_user_message_card, this)
+
+        dateTextView = findViewById(R.id.txtDate)
+        messageTextView = findViewById(R.id.txtUserMessage)
+        emojiLayout = findViewById(R.id.emojiLayout)
+
+        var margin = 0
+
         context.withStyledAttributes(attributeSet, R.styleable.MessageCardLayout) {
             val backgroundDrawable =
                 this.getDrawable(R.styleable.MessageCardLayout_android_background)
             this@UserMessageCardLayout.background = backgroundDrawable
+
+            margin = this.getDimension(R.styleable.MessageCardLayout_defaultMargin, 8f.dp(context))
+                .toInt()
+
+            val message = this.getString(R.styleable.MessageCardLayout_message)
+            messageTextView.text = message
+
         }
+        defaultMargin = margin
 
         initDate()
         initMessage()
-        initEmojiLayout()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -132,23 +144,11 @@ class UserMessageCardLayout @JvmOverloads constructor(
     }
 
     private fun initDate() {
-        val dateTextView = TextView(context)
-        dateTextView.id = R.id.emojiDate
         dateTextView.setTextColor(Color.BLACK)
-        addView(dateTextView)
     }
 
     private fun initMessage() {
-        val messageTextView = TextView(context)
-        messageTextView.id = R.id.emojiMessage
         messageTextView.setTextColor(context.getColor(R.color.white))
-        addView(messageTextView)
-    }
-
-    private fun initEmojiLayout() {
-        val flexBoxLayout = FlexBoxLayout(context)
-        flexBoxLayout.id = R.id.emojiLayout
-        addView(flexBoxLayout)
     }
 
     fun addReaction(list: List<Reaction>) {
