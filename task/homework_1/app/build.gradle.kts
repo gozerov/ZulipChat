@@ -16,6 +16,8 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -28,14 +30,18 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_18
-        targetCompatibility = JavaVersion.VERSION_18
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "18"
+        jvmTarget = "17"
     }
     buildFeatures {
         viewBinding = true
+    }
+    testOptions {
+        unitTests.all { it.useJUnitPlatform() }
+        animationsDisabled = true
     }
 }
 
@@ -63,6 +69,7 @@ dependencies {
     implementation(libs.elmslie.coroutines)
 
     implementation(libs.dagger)
+    implementation(libs.androidx.fragment.testing)
     ksp(libs.dagger.compiler)
 
     implementation(libs.androidx.room.runtime)
@@ -70,5 +77,38 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.paging)
+
+    // Andriod Test Rules
+    implementation(libs.androidx.rules)
+
+    // JUnit
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+
+    //Kotest
+    testImplementation(libs.kotest.junit)
+    testImplementation(libs.kotest.assertions)
+
+    // Kaspresso
+    androidTestImplementation(libs.kaspresso)
+
+    //Wiremock
+    androidTestImplementation(libs.wiremock) {
+        exclude(group = "org.apache.httpcomponents", module = "httpclient")
+    }
+
+    // Hamcrest Matchers
+    androidTestImplementation(libs.hamcrest)
+
+    // Espresso Intents
+    androidTestImplementation(libs.androidx.espresso.intents)
+
+    //Dagger2 for tests
+    kaptAndroidTest(libs.dagger)
+    testImplementation(libs.dagger)
+    testAnnotationProcessor(libs.dagger.compiler)
+
+    androidTestImplementation(libs.dagger)
+    androidTestImplementation(libs.dagger.support)
 
 }

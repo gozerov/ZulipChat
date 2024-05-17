@@ -1,0 +1,50 @@
+{
+  "messages": [
+    {
+      "id": 432979253,
+      "sender_id": 708831,
+      "content": "<p>asdasdasd</p>",
+      "timestamp": 1712954716,
+      "is_me_message": false,
+      "reactions": [
+        {
+          "emoji_name": "smile",
+          "emoji_code": "1f642",
+          "reaction_type": "unicode_emoji",
+          "user_id": 708832
+        },
+        {
+          "emoji_name": "smile",
+          "emoji_code": "1f642",
+          "reaction_type": "unicode_emoji",
+          "user_id": 709664
+        }
+      ],
+      "sender_full_name": "Denis",
+      "avatar_url": "https://secure.gravatar.com/avatar/9098f779a0cc7db275e2f0dcf793dfc6?d=identicon&version=1"
+    },
+    {
+      "id": 433027146,
+      "sender_id": 708846,
+      "timestamp": 1712996149,
+      "is_me_message": false,
+      "reactions": [
+        {
+          "emoji_name": "grinning_face_with_smiling_eyes",
+          "emoji_code": "1f601",
+          "reaction_type": "unicode_emoji",
+          "user_id": 708832
+        },
+        {
+          "emoji_name": "nauseated",
+          "emoji_code": "1f922",
+          "reaction_type": "unicode_emoji",
+          "user_id": 708846
+        }
+      ],
+      "sender_full_name": "Mike Naumov",
+      "sender_email": "user708846@tinkoff-android-spring-2024.zulipchat.com",
+      "avatar_url": "https://zulip-avatars.s3.amazonaws.com/63414/45910eefc812ce61bcf2bb77a6cd227ab0546c39?version=2"
+    }
+  ]
+}

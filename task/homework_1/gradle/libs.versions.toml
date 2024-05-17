@@ -20,12 +20,20 @@ dagger = "2.51.1"
 room = "2.6.1"
 ksp = "1.9.23-1.0.20"
 paging = "3.2.1"
+kaspresso = "1.5.5"
+rules = "1.5.0"
+androidx-test = "1.5.0"
+kotest = "5.8.1"
+wiremock = "2.27.2"
+fragmentTesting = "1.7.1"
+hamcrest = "2.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+kaspresso = { group = "com.kaspersky.android-components", name = "kaspresso", version.ref = "kaspresso" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
@@ -47,10 +55,19 @@ elmslie-android = { group = "com.github.vivid-money.elmslie", name = "elmslie-an
 elmslie-coroutines = { group = "com.github.vivid-money.elmslie", name = "elmslie-coroutines", version.ref = "elmslie" }
 dagger = { group = "com.google.dagger", name = "dagger", version.ref = "dagger" }
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }
+dagger-support = { group = "com.google.dagger", name = "dagger-android-support", version.ref = "dagger" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-paging = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
+androidx-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
+androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidx-test" }
+kotest-junit = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
+kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+wiremock = { group = "com.github.tomakehurst", name = "wiremock-standalone", version.ref = "wiremock" }
+androidx-espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espressoCore" }
+androidx-fragment-testing = { group = "androidx.fragment", name = "fragment-testing", version.ref = "fragmentTesting" }
+hamcrest = { group = "org.hamcrest", name = "hamcrest", version.ref = "hamcrest" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

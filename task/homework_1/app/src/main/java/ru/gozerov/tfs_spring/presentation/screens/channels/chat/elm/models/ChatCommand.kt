@@ -2,37 +2,37 @@ package ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm.models
 
 sealed interface ChatCommand {
 
-    class LoadChat(
+    data class LoadChat(
         val stream: String,
         val topic: String,
         val fromCache: Boolean
     ) : ChatCommand
 
-    class SendMessage(
+    data class SendMessage(
         val channel: String,
         val topic: String,
         val content: String
     ) : ChatCommand
 
-    class RegisterEventQueue(
+    data class RegisterEventQueue(
         val topic: String
     ) : ChatCommand
 
-    class AddReaction(
+    data class AddReaction(
         val messageId: Int,
         val emojiName: String
     ) : ChatCommand
 
-    class RemoveReaction(
+    data class RemoveReaction(
         val messageId: Int,
         val emojiName: String
     ) : ChatCommand
 
-    class GetEventsFromQueue(
+    data class GetEventsFromQueue(
         val queueId: String,
         val lastId: Int
     ) : ChatCommand
 
-    object Exit : ChatCommand
+    data object Exit : ChatCommand
 
 }
