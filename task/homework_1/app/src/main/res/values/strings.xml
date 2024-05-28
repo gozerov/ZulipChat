@@ -11,4 +11,6 @@
     <string name="users_and">Users…</string>
     <string name="search_and">Search…</string>
     <string name="offline">offline</string>
+    <string name="topic_is">Topic: #%1$s</string>
+    <string name="channel_is">#%1$s</string>
 </resources>

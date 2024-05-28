@@ -2,7 +2,6 @@ package ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters
 
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import ru.gozerov.tfs_spring.core.AdapterDelegate
 import ru.gozerov.tfs_spring.core.DelegateItem
@@ -16,9 +15,8 @@ class MainChatAdapter : PagingDataAdapter<DelegateItem, ViewHolder>(DelegateItem
         delegates[viewType].onCreateViewHolder(parent)
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        getItem(position)?.let {
-
-        delegates[getItemViewType(position)].onBindViewHolder(holder, it, position)
+        getItem(position)?.let { item ->
+            delegates[getItemViewType(position)].onBindViewHolder(holder, item, position)
         }
     }
 

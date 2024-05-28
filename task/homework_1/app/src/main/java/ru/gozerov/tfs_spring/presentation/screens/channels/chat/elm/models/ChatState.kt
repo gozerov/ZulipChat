@@ -9,5 +9,6 @@ data class ChatState(
     val fromCache: Boolean = true,
     val flowItems: Flow<PagingData<DelegateItem>>? = null,
     val items: PagingData<DelegateItem>? = null,
-    val positionToScroll: Int? = null
+    val isFirstPage: Boolean = false,
+    val isError: Boolean = false
 )

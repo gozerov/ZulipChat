@@ -2,7 +2,9 @@ package ru.gozerov.tfs_spring.di.application
 
 import dagger.Binds
 import dagger.Module
+import ru.gozerov.tfs_spring.data.repositories.UsersRepositoryImpl
 import ru.gozerov.tfs_spring.data.repositories.ZulipRepositoryImpl
+import ru.gozerov.tfs_spring.domain.repositories.UsersRepository
 import ru.gozerov.tfs_spring.domain.repositories.ZulipRepository
 import javax.inject.Singleton
 
@@ -12,5 +14,9 @@ interface AppBindModule {
     @Binds
     @Singleton
     fun bindZulipRepoImpl(zulipRepositoryImpl: ZulipRepositoryImpl): ZulipRepository
+
+    @Binds
+    @Singleton
+    fun bindUsersRepoImpl(usersRepositoryImpl: UsersRepositoryImpl): UsersRepository
 
 }

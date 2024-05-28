@@ -39,7 +39,6 @@ class TopicDelegate(
             with(binding) {
                 root.tag = data
                 txtTitle.text = data.title
-                txtMessageCount.text = data.messageCount.toString()
                 root.setBackgroundColor(data.color.toArgb())
             }
         }

@@ -7,6 +7,8 @@ sealed interface ChannelListCommand {
 
     object LoadChannels : ChannelListCommand
 
+    object ClearSearch : ChannelListCommand
+
     class ExpandItems(
         val channel: ChannelModel,
         val categoryInd: Int

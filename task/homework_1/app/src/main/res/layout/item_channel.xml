@@ -1,28 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/_64dp"
-    android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/_16dp"
-    android:background="@color/grey_background">
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/txtTitle"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:lines="1"
-        tools:text="#general"
-        android:gravity="center_vertical"
-        android:textColor="@color/white"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_63dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/_16dp"
+        android:background="@color/grey_background">
 
-    <ImageView
-        android:id="@+id/imgArrow"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:contentDescription="@string/contentDescription"
-        tools:src="@drawable/ic_arrow_down_24"/>
+        <TextView
+            android:id="@+id/txtTitle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:lines="1"
+            android:textSize="@dimen/_18sp"
+            tools:text="#general"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"/>
+
+        <ImageView
+            android:id="@+id/imgArrow"
+            android:layout_width="@dimen/_36dp"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/contentDescription"
+            tools:src="@drawable/ic_arrow_down_24"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/grey_surface" />
 
 </LinearLayout>

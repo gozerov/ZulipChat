@@ -39,7 +39,7 @@ class ChannelDelegate(
 
         fun bind(data: ChannelModel) {
             binding.root.tag = data
-            binding.txtTitle.text = data.title
+            binding.txtTitle.text = binding.root.context.getString(R.string.channel_is, data.title)
             if (data.isExpanded)
                 binding.imgArrow.setImageResource(R.drawable.ic_arrow_up_24)
             else

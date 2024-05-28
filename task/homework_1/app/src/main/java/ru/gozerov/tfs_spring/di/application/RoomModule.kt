@@ -23,6 +23,10 @@ class RoomModule {
 
     @Singleton
     @Provides
+    fun provideUsersDao(context: Context) = AppDatabase.getInstance(context).getUsersDao()
+
+    @Singleton
+    @Provides
     fun provideAppDatabase(context: Context) = AppDatabase.getInstance(context)
 
 }

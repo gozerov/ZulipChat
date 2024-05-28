@@ -1,13 +1,13 @@
 package ru.gozerov.tfs_spring.presentation.activity
 
 import androidx.fragment.app.Fragment
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface ToolbarHolder {
 
     fun updateToolbar(toolbarState: ToolbarState)
 
-    val searchFieldFlow: SharedFlow<String>
+    val searchFieldFlow: StateFlow<String>
 
 }
 

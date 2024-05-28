@@ -9,7 +9,7 @@ class SendMessageUseCase @Inject constructor(
     private val zulipRepository: ZulipRepository
 ) {
 
-    suspend operator fun invoke(channel: String, topic: String, content: String) =
+    suspend operator fun invoke(channel: String, topic: String, content: String): Int =
         withContext(Dispatchers.IO) {
             return@withContext zulipRepository.sendMessage("stream", channel, topic, content)
         }

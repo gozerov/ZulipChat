@@ -2,9 +2,23 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/grey_secondary_background">
 
+    <TextView
+        android:id="@+id/txtTopic"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_42dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/grey_dialog"
+        android:gravity="center"
+        android:textColor="@color/grey_text"
+        android:textSize="@dimen/_18sp"
+        tools:text="Topic: #testing"/>
+    
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messageList"
         android:layout_width="match_parent"
@@ -14,7 +28,7 @@
         app:layout_constraintBottom_toTopOf="@id/messageInputField"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/txtTopic" />
 
     <EditText
         android:id="@+id/messageInputField"

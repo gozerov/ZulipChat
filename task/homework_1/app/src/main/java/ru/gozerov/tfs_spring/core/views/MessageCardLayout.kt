@@ -2,9 +2,7 @@ package ru.gozerov.tfs_spring.core.views
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.drawable.Drawable
 import android.text.Html
 import android.util.AttributeSet
 import android.view.View
@@ -27,8 +25,6 @@ class MessageCardLayout @JvmOverloads constructor(
     val imageView: ImageView
 
     private val usernameTextView: TextView
-
-    private val dateTextView: TextView
 
     private val messageTextView: TextView
 
@@ -54,16 +50,6 @@ class MessageCardLayout @JvmOverloads constructor(
             }
         }
 
-    var date = ""
-        set(value) {
-            if (field != value) {
-                field = value
-                dateTextView.text = field
-                requestLayout()
-                invalidate()
-            }
-        }
-
     private val imageSize: Int
     private val defaultMargin: Int
     private val backgroundPaint = Paint().apply {
@@ -71,21 +57,12 @@ class MessageCardLayout @JvmOverloads constructor(
         this.setColor(context.getColor(R.color.grey_dialog))
     }
 
-    var imageDrawable: Drawable? = null
-        set(value) {
-            field = value
-            imageView.setImageDrawable(field)
-            requestLayout()
-            invalidate()
-        }
-
     init {
         setWillNotDraw(false)
         inflate(context, R.layout.layout_message_card, this)
 
         imageView = findViewById(R.id.imgAvatar)
         usernameTextView = findViewById(R.id.txtUsername)
-        dateTextView = findViewById(R.id.txtDate)
         messageTextView = findViewById(R.id.txtMessage)
         emojiLayout = findViewById(R.id.emojiLayout)
 
@@ -115,7 +92,6 @@ class MessageCardLayout @JvmOverloads constructor(
         this.imageSize = imageSize
         initImage()
         initUsername(attributeSet)
-        initDate()
         initMessage()
     }
 
@@ -126,7 +102,7 @@ class MessageCardLayout @JvmOverloads constructor(
         }
         val parentWidth = (MeasureSpec.getSize(widthMeasureSpec))
         val messageDesiredWidth = MeasureSpec.makeMeasureSpec(
-            (parentWidth * 0.7f).toInt() - dateTextView.measuredWidth - imageView.measuredWidth - defaultMargin * 2,
+            (parentWidth * 0.7f).toInt() - imageView.measuredWidth - defaultMargin * 2,
             MeasureSpec.AT_MOST
         )
         messageTextView.measure(messageDesiredWidth, messageTextView.measuredHeight)
@@ -154,18 +130,9 @@ class MessageCardLayout @JvmOverloads constructor(
         val nameStart = imageEnd + 2 * defaultMargin
         val nameBottom = imageTop + defaultMargin + usernameTextView.measuredHeight
 
-        val mainContainerWidth = maxOf(
-            maxOf(messageTextView.measuredWidth, usernameTextView.measuredWidth),
-            emojiLayout.measuredWidth
-        )
-
-        val dateStart = nameStart + mainContainerWidth + defaultMargin
-        val dateEnd = dateStart + dateTextView.measuredWidth
-
         val messageBottom = nameBottom + messageTextView.measuredHeight
 
         imageView.layout(imageStart, imageTop, imageEnd, imageBottom)
-        //dateTextView.layout(dateStart, imageTop, dateEnd, imageTop + dateTextView.measuredHeight)
 
         usernameTextView.layout(
             nameStart,
@@ -215,7 +182,6 @@ class MessageCardLayout @JvmOverloads constructor(
     }
 
     private fun initImage() {
-        imageView.clipToOutline = true
         imageView.layoutParams = MarginLayoutParams(imageSize, imageSize)
         imageView.updateLayoutParams<MarginLayoutParams> {
             this.marginStart = defaultMargin
@@ -229,10 +195,6 @@ class MessageCardLayout @JvmOverloads constructor(
             this.marginStart = defaultMargin
         }
         usernameTextView.setTextColor(context.getColor(R.color.teal_400))
-    }
-
-    private fun initDate() {
-        dateTextView.setTextColor(Color.BLACK)
     }
 
     private fun initMessage() {

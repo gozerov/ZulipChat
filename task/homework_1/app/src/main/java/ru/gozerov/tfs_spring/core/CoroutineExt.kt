@@ -1,7 +1,6 @@
 package ru.gozerov.tfs_spring.core
 
 import kotlinx.coroutines.CancellationException
-import java.lang.Exception
 
 inline fun <R> runCatchingNonCancellation(block: () -> R): Result<R> {
     return try {

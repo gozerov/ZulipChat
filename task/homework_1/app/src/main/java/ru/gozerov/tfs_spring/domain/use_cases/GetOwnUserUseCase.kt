@@ -2,16 +2,16 @@ package ru.gozerov.tfs_spring.domain.use_cases
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ru.gozerov.tfs_spring.domain.mappers.toUserContact
-import ru.gozerov.tfs_spring.domain.repositories.ZulipRepository
+import ru.gozerov.tfs_spring.data.remote.api.models.UserContact
+import ru.gozerov.tfs_spring.domain.repositories.UsersRepository
 import javax.inject.Inject
 
 class GetOwnUserUseCase @Inject constructor(
-    private val zulipRepository: ZulipRepository
+    private val usersRepository: UsersRepository
 ) {
 
-    suspend operator fun invoke() = withContext(Dispatchers.IO) {
-        return@withContext zulipRepository.getOwnUser().toUserContact()
+    suspend operator fun invoke(): UserContact = withContext(Dispatchers.IO) {
+        return@withContext usersRepository.getOwnUser()
     }
 
 }

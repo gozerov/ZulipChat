@@ -2,26 +2,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/_42dp"
-    tools:background="@color/teal_400"
-    android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/_32dp">
+    android:layout_height="@dimen/_44dp"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/txtTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:textColor="@color/white"
-        tools:text="Testing"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_42dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/_32dp"
+        tools:background="@color/teal_400">
 
-    <TextView
-        android:id="@+id/txtMessageCount"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/_24dp"
-        android:gravity="center_vertical"
-        tools:text="1240 mes"
-        android:textColor="@color/white_text_secondary"/>
+        <TextView
+            android:id="@+id/txtTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"
+            tools:text="Testing" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_2dp"
+        android:background="@color/grey_dialog" />
 
 </LinearLayout>

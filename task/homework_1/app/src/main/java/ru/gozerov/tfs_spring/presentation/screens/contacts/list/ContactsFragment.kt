@@ -78,7 +78,13 @@ class ContactsFragment : ElmFragment<ContactListEvent, ContactListEffect, Contac
     }
 
     override fun render(state: ContactListState) {
-        state.contacts?.run { contactsAdapter.data = this }
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                state.contacts?.collect { users ->
+                    contactsAdapter.data = users
+                }
+            }
+        }
     }
 
 }

@@ -1,16 +1,15 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm
 
+import android.util.Log
 import androidx.paging.insertFooterItem
 import androidx.paging.map
 import kotlinx.coroutines.flow.flowOf
 import ru.gozerov.tfs_spring.core.DelegateItem
 import ru.gozerov.tfs_spring.core.utils.getEmojiByUnicode
 import ru.gozerov.tfs_spring.core.utils.mapMonth
-import ru.gozerov.tfs_spring.data.remote.api.EventQueueData
 import ru.gozerov.tfs_spring.data.remote.api.models.Message
 import ru.gozerov.tfs_spring.data.remote.api.models.MutableReaction
 import ru.gozerov.tfs_spring.data.remote.api.models.ZulipEvent
-import ru.gozerov.tfs_spring.domain.stubs.ChannelsStub
 import ru.gozerov.tfs_spring.domain.stubs.UserStub
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.date.DateDelegateItem
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.date.DateModel
@@ -30,21 +29,13 @@ import java.util.TimeZone
 class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() {
 
     override fun Result.reduce(event: ChatEvent) = when (event) {
-        is ChatEvent.UI.Init -> {
-            state { copy(isLoading = true) }
-            commands {
-                +ChatCommand.LoadChat(event.stream, event.topic, event.fromCache)
-                +ChatCommand.RegisterEventQueue(event.topic)
-            }
-        }
-
         is ChatEvent.Internal.LoadChatSuccess -> {
             state {
                 copy(
                     isLoading = false,
                     fromCache = event.fromCache,
                     flowItems = event.items,
-                    positionToScroll = event.positionToScroll
+                    isFirstPage = event.isFirstPage
                 )
             }
         }
@@ -54,13 +45,21 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
             effects { +ChatEffect.ShowError }
         }
 
+        is ChatEvent.UI.Init -> {
+            state { copy(isLoading = true) }
+            commands {
+                +ChatCommand.LoadChat(event.stream, event.topic, event.fromCache)
+                +ChatCommand.RegisterEventQueue(event.topic)
+            }
+        }
+
         is ChatEvent.UI.LoadMessages -> {
             state { copy(isLoading = true) }
             commands { +ChatCommand.LoadChat(event.stream, event.topic, event.fromCache) }
         }
 
         is ChatEvent.UI.SaveMessages -> {
-            state { copy(flowItems = null, items = event.data) }
+            state { copy(flowItems = null, items = event.data, isFirstPage = false) }
         }
 
         is ChatEvent.UI.SendMessage -> {
@@ -89,9 +88,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
         }
 
         is ChatEvent.Internal.RegisteredEventQueue -> {
-            EventQueueData.lastId = event.lastEventId
-            EventQueueData.queueId = event.queueId
-            commands { +ChatCommand.GetEventsFromQueue(event.queueId, event.lastEventId) }
+            commands { +ChatCommand.GetEventsFromQueue() }
         }
 
         is ChatEvent.Internal.NewEventsFromQueue -> {
@@ -155,7 +152,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
             } else item
         }
         newItems?.let {
-            state { copy(flowItems = flowOf(newItems), items = newItems, positionToScroll = null) }
+            state { copy(flowItems = flowOf(newItems), items = newItems) }
         }
     }
 
@@ -207,22 +204,27 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
 
                 } else it
             }
-            state { copy(flowItems = flowOf(newItems), items = newItems, positionToScroll = null) }
+            state { copy(flowItems = flowOf(newItems), items = newItems) }
         }
     }
 
 
     private fun Result.obtainNewMessages(items: List<ZulipEvent>) {
         val messages = mutableListOf<Message>()
-        var lastId = -1
+
         items.forEach {
-            lastId = it.id
             if (it.type == "message") {
                 messages.add(it.message)
             }
         }
+        var lastDate = ""
+        state.items?.map { item ->
+            if (item is DateDelegateItem) {
+                lastDate = (item.content() as DateModel).date
+            }
+            item
+        }
         var dateCount = 0
-        var lastDate = ChannelsStub.lastDate
         val calendar = Calendar.getInstance()
         calendar.timeZone = TimeZone.getTimeZone("Europe/Moscow")
         val messageItems = mutableListOf<DelegateItem>()
@@ -294,15 +296,10 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
             messageItems.forEach {
                 newData = data.insertFooterItem(item = it)
             }
-            state { copy(items = newData, flowItems = flowOf(newData), positionToScroll = null) }
-            EventQueueData.lastId = lastId
-            ChannelsStub.lastDate = lastDate
+            state { copy(items = newData, flowItems = flowOf(newData)) }
         }
         commands {
-            +ChatCommand.GetEventsFromQueue(
-                EventQueueData.queueId,
-                lastId
-            )
+            +ChatCommand.GetEventsFromQueue()
         }
     }
 

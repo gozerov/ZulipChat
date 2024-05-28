@@ -7,19 +7,18 @@ import androidx.room.RoomDatabase
 import ru.gozerov.tfs_spring.data.cache.dao.MessageDao
 import ru.gozerov.tfs_spring.data.cache.dao.StreamDao
 import ru.gozerov.tfs_spring.data.cache.dao.TopicDao
+import ru.gozerov.tfs_spring.data.cache.dao.UserDao
 import ru.gozerov.tfs_spring.data.cache.entities.MessageEntity
-import ru.gozerov.tfs_spring.data.cache.entities.MessageReactionEntity
-import ru.gozerov.tfs_spring.data.cache.entities.ReactionEntity
 import ru.gozerov.tfs_spring.data.cache.entities.StreamEntity
 import ru.gozerov.tfs_spring.data.cache.entities.TopicEntity
+import ru.gozerov.tfs_spring.data.cache.entities.UserEntity
 
 @Database(
     entities = [
         MessageEntity::class,
-        MessageReactionEntity::class,
-        ReactionEntity::class,
         StreamEntity::class,
-        TopicEntity::class
+        TopicEntity::class,
+        UserEntity::class
     ],
     version = 1
 )
@@ -28,6 +27,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun getMessageDao(): MessageDao
     abstract fun getStreamDao(): StreamDao
     abstract fun getTopicDao(): TopicDao
+    abstract fun getUsersDao(): UserDao
 
     companion object {
 
@@ -46,8 +46,7 @@ abstract class AppDatabase : RoomDatabase() {
         const val STREAM_TABLE_NAME = "stream"
         const val TOPIC_TABLE_NAME = "topic"
         const val MESSAGE_TABLE_NAME = "message"
-        const val REACTION_TABLE_NAME = "reaction"
-        const val MESSAGE_AND_REACTIONS_TABLE_NAME = "message_reactions"
+        const val USERS_TABLE_NAME = "users"
 
     }
 

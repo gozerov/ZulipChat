@@ -16,9 +16,9 @@ class ChannelListReducer @Inject constructor(
 ) :
     DslReducer<ChannelListEvent, ChannelListState, ChannelListEffect, ChannelListCommand>() {
 
-    override fun Result.reduce(event: ChannelListEvent) = when (event) {
+    override fun Result.reduce(event: ChannelListEvent): Unit = when (event) {
         is ChannelListEvent.Internal.SuccessLoadedChannels -> {
-            state { copy(isLoading = false, channels = event.channels) }
+            state { copy(isLoading = false, channels = event.channels, isNavigating = false) }
         }
 
         is ChannelListEvent.Internal.ErrorLoadedChannels -> {
@@ -38,9 +38,32 @@ class ChannelListReducer @Inject constructor(
             Unit
         }
 
+        is ChannelListEvent.Internal.ExpandedChannels -> {
+            state {
+                state.copy(
+                    channels = state.channels?.mapValues { entry ->
+                        if (entry.key == event.result.category) {
+                            event.result.items
+                        } else entry.value
+                    }
+                )
+            }
+        }
+
         is ChannelListEvent.UI.LoadChannels -> {
+
             state { copy(isLoading = true) }
             commands { +ChannelListCommand.LoadChannels }
+        }
+
+        is ChannelListEvent.UI.Exit -> {
+            if (!state.isNavigating)
+                commands { +ChannelListCommand.ClearSearch }
+            Unit
+        }
+
+        is ChannelListEvent.UI.EnableSearch -> {
+            state { copy(isNavigating = false) }
         }
 
         is ChannelListEvent.UI.ExpandItems -> {
@@ -48,10 +71,16 @@ class ChannelListReducer @Inject constructor(
         }
 
         is ChannelListEvent.UI.Search -> {
-            commands { +ChannelListCommand.Search(event.text) }
+            if (!state.isNavigating) {
+                state { copy(query = event.text) }
+                commands { +ChannelListCommand.Search(event.text) }
+            } else {
+                effects { +ChannelListEffect.UpdateToolbar(state.query) }
+            }
         }
 
         is ChannelListEvent.UI.LoadChannel -> {
+            state { copy(isNavigating = true) }
             commands { +ChannelListCommand.LoadChannel(event.topic, event.categoryId) }
         }
     }

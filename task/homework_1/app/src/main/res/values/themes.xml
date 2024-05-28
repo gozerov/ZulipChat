@@ -1,15 +1,16 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.TFS_spring_2024" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-         <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimary">@color/white</item>
         <item name="colorOnSurface">@color/white</item>
     </style>
 
     <style name="Theme.TFS_spring_2024" parent="Base.Theme.TFS_spring_2024" />
 
     <style name="TabTextStyle" parent="TextAppearance.AppCompat">
-        <item name="android:textSize">@dimen/_18sp</item>
+        <item name="android:textSize">@dimen/_20sp</item>
     </style>
 
+    <dimen name="_20sp">20sp</dimen>
 </resources>

@@ -2,6 +2,7 @@ package ru.gozerov.tfs_spring.presentation.screens.contacts.list.elm
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import ru.gozerov.tfs_spring.core.runCatchingNonCancellation
 import ru.gozerov.tfs_spring.domain.stubs.UserStub
 import ru.gozerov.tfs_spring.domain.use_cases.GetContactsUseCase
@@ -24,7 +25,6 @@ class ContactListActor @Inject constructor(
                 }
                     .fold(
                         onSuccess = {
-                            UserStub.users = it
                             emit(ContactListEvent.Internal.SuccessLoadedContacts(it))
                         },
                         onFailure = {
@@ -38,8 +38,8 @@ class ContactListActor @Inject constructor(
                     searchContactsByNameUseCase.invoke(command.name)
                 }
                     .fold(
-                        onSuccess = {
-                            emit(ContactListEvent.Internal.SuccessLoadedContacts(it))
+                        onSuccess = { users ->
+                            emit(ContactListEvent.Internal.SuccessLoadedContacts(flowOf(users)))
                         },
                         onFailure = {
                             emit(ContactListEvent.Internal.ErrorLoadedContacts)

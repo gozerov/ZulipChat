@@ -8,7 +8,7 @@ import javax.inject.Inject
 class RemoveReactionUseCase @Inject constructor(
     private val zulipRepository: ZulipRepository
 ) {
-    suspend operator fun invoke(messageId: Int, emojiName: String) =
+    suspend operator fun invoke(messageId: Int, emojiName: String): Unit =
         withContext(Dispatchers.IO) {
             return@withContext zulipRepository.removeReaction(messageId, emojiName)
         }

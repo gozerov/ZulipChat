@@ -8,6 +8,7 @@ import ru.gozerov.tfs_spring.data.cache.AppDatabase
 import ru.gozerov.tfs_spring.data.cache.dao.MessageDao
 import ru.gozerov.tfs_spring.data.remote.api.ZulipApi
 import ru.gozerov.tfs_spring.data.remote.api.ZulipLongPollingApi
+import ru.gozerov.tfs_spring.domain.repositories.UsersRepository
 import ru.gozerov.tfs_spring.domain.repositories.ZulipRepository
 import javax.inject.Singleton
 
@@ -16,6 +17,7 @@ import javax.inject.Singleton
 interface AppComponent {
 
     val zulipRepository: ZulipRepository
+    val usersRepository: UsersRepository
     val zulipApi: ZulipApi
     val zulipLongPollingApi: ZulipLongPollingApi
 

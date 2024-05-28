@@ -4,9 +4,8 @@ sealed interface ChannelListEffect {
 
     object ShowError : ChannelListEffect
 
-    class LoadedChannel(
-        val title: String,
-        val channelName: String
-    ) : ChannelListEffect
+    class LoadedChannel(val title: String) : ChannelListEffect
+
+    class UpdateToolbar(val text: String) : ChannelListEffect
 
 }

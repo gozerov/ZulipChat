@@ -52,7 +52,8 @@ class ChannelListFragment : ElmFragment<ChannelListEvent, ChannelListEffect, Cha
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        val component = DaggerChannelListComponent.factory().create(lifecycle, findNavController(), context.appComponent)
+        val component = DaggerChannelListComponent.factory()
+            .create(lifecycle, findNavController(), context.appComponent)
         component.inject(this)
     }
 
@@ -62,17 +63,19 @@ class ChannelListFragment : ElmFragment<ChannelListEvent, ChannelListEffect, Cha
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentChannelListBinding.inflate(inflater, container, false)
-        updateToolbar(ToolbarState.Search(getString(R.string.search_and)))
-        val channelDelegate = ChannelDelegate {
-            storeHolder.store.accept(
+        val channelDelegate = ChannelDelegate { channel ->
+            val position = binding.channelsViewPager.computeScroll()
+            Log.e("AAA", position.toString())
+            store.accept(
                 ChannelListEvent.UI.ExpandItems(
-                    it,
+                    channel,
+                    binding.channelsViewPager.scrollState,
                     binding.categoryTabs.selectedTabPosition
                 )
             )
         }
         val topicDelegate = TopicDelegate {
-            storeHolder.store.accept(
+            store.accept(
                 ChannelListEvent.UI.LoadChannel(it, binding.categoryTabs.selectedTabPosition)
             )
         }
@@ -80,8 +83,8 @@ class ChannelListFragment : ElmFragment<ChannelListEvent, ChannelListEffect, Cha
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    searchFieldFlow.collect {
-                        storeHolder.store.accept(ChannelListEvent.UI.Search(it))
+                    searchFieldFlow.collect { query ->
+                        store.accept(ChannelListEvent.UI.Search(query))
                     }
                 }
             }
@@ -107,6 +110,9 @@ class ChannelListFragment : ElmFragment<ChannelListEvent, ChannelListEffect, Cha
             binding.channelsViewPager.visibility = View.VISIBLE
             configureTabsMediator(keys.toList())
             channelPagerAdapter.data = values.toList()
+            if (!state.isNavigating && state.query.isEmpty())
+                updateToolbar(ToolbarState.Search(getString(R.string.search_and)))
+
         }
     }
 
@@ -117,8 +123,12 @@ class ChannelListFragment : ElmFragment<ChannelListEvent, ChannelListEffect, Cha
         }
 
         is ChannelListEffect.LoadedChannel -> {
-            Log.e("TTTTT", "navigating")
-            Unit
+
+        }
+
+        is ChannelListEffect.UpdateToolbar -> {
+            updateToolbar(ToolbarState.SearchWithText(effect.text))
+            store.accept(ChannelListEvent.UI.EnableSearch)
         }
     }
 

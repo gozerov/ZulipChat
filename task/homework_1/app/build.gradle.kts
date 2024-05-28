@@ -76,6 +76,8 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    implementation(libs.glide)
+
     implementation(libs.androidx.paging)
 
     // Andriod Test Rules

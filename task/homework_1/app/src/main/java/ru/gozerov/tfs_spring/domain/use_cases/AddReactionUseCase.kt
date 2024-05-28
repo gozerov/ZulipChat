@@ -8,8 +8,9 @@ import javax.inject.Inject
 class AddReactionUseCase @Inject constructor(
     private val zulipRepository: ZulipRepository
 ) {
-    suspend operator fun invoke(messageId: Int, emojiName: String) = withContext(Dispatchers.IO) {
-        zulipRepository.addReaction(messageId, emojiName)
-    }
+    suspend operator fun invoke(messageId: Int, emojiName: String): Unit =
+        withContext(Dispatchers.IO) {
+            zulipRepository.addReaction(messageId, emojiName)
+        }
 
 }

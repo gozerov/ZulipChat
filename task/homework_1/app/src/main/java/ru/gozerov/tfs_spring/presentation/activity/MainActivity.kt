@@ -11,29 +11,25 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.google.android.material.internal.ViewUtils.hideKeyboard
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity(),
-    ToolbarHolder {
+class MainActivity : AppCompatActivity(), ToolbarHolder {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val _searchFieldFlow = MutableSharedFlow<String>(1, 0, BufferOverflow.DROP_OLDEST)
+    private val _searchFieldFlow = MutableStateFlow("")
 
     @OptIn(FlowPreview::class)
-    override val searchFieldFlow: SharedFlow<String>
+    override val searchFieldFlow: StateFlow<String>
         get() = _searchFieldFlow
-            .distinctUntilChanged()
             .debounce(200)
-            .shareIn(lifecycleScope, SharingStarted.Lazily, 1)
+            .stateIn(lifecycleScope, SharingStarted.Lazily, "")
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,8 +100,33 @@ class MainActivity : AppCompatActivity(),
                 }
                 binding.searchField.post {
                     binding.searchEditText.hint = toolbarState.title
+                    binding.searchEditText.editableText.clear()
                     binding.searchField.clearFocus()
                     binding.globalFragmentContainer.requestFocus()
+                }
+                binding.endActionButton.setOnClickListener {
+                    hideKeyboard(binding.root)
+                    binding.globalFragmentContainer.requestFocus()
+                }
+            }
+
+            is ToolbarState.SearchWithText -> {
+                binding.toolbar.visibility = View.VISIBLE
+                binding.toolbar.setBackgroundColor(getColor(R.color.grey_secondary_background))
+                binding.startActionButton.visibility = View.GONE
+                binding.endActionButton.setImageResource(R.drawable.ic_search_24)
+                binding.endActionButton.visibility = View.VISIBLE
+                binding.startToolbarTitle.visibility = View.GONE
+                binding.searchField.visibility = View.VISIBLE
+                binding.centerToolbarTitle.visibility = View.GONE
+                window.statusBarColor = getColor(R.color.grey_secondary_background)
+                binding.searchEditText.setOnEditorActionListener { v, actionId, event ->
+                    hideKeyboard(binding.root)
+                    return@setOnEditorActionListener true
+                }
+                binding.searchField.post {
+                    binding.searchEditText.setText(toolbarState.text)
+                    binding.searchEditText.setSelection(toolbarState.text.length)
                 }
                 binding.endActionButton.setOnClickListener {
                     hideKeyboard(binding.root)

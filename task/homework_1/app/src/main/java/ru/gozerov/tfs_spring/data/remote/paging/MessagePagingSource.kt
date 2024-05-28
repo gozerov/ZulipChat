@@ -1,6 +1,5 @@
 package ru.gozerov.tfs_spring.data.remote.paging
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import dagger.assisted.Assisted
@@ -15,7 +14,6 @@ import ru.gozerov.tfs_spring.data.cache.entities.toMessageEntity
 import ru.gozerov.tfs_spring.data.remote.api.ZulipApi
 import ru.gozerov.tfs_spring.data.remote.api.models.Message
 import ru.gozerov.tfs_spring.data.remote.api.models.MutableReaction
-import ru.gozerov.tfs_spring.domain.stubs.ChannelsStub
 import ru.gozerov.tfs_spring.domain.stubs.UserStub
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.date.DateDelegateItem
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.date.DateModel
@@ -52,7 +50,6 @@ class MessagePagingSource @AssistedInject constructor(
             val savedMessages = messageDao.getMessages(streamName, topicName)
             if (savedMessages.isNotEmpty()) {
                 loadedFromCache = true
-                ChannelsStub.fromCache = true
                 return LoadResult.Page(
                     mapMessages(savedMessages.map { it.toMessage(listOf()) }),
                     0,
@@ -62,28 +59,37 @@ class MessagePagingSource @AssistedInject constructor(
                 )
             }
         }
-        val response = zulipApi.getMessages(
-            pageSize, 0, lastId.toString(), "[\n" +
-                    "    {\n" +
-                    "        \"operator\": \"stream\",\n" +
-                    "        \"operand\": \"$streamName\"\n" +
-                    "    },\n" +
-                    "    {\n" +
-                    "        \"operator\": \"topic\",\n" +
-                    "        \"operand\": \"$topicName\"\n" +
-                    "    }\n" +
-                    "]"
-        )
-        val prevKey = if (response.messages.size < 20) null else page + 1
-        val nextKey = if (page == 1) null else page - 1
-        lastId = response.messages.firstOrNull()?.id?.toLong() ?: 0
-        if (page == 1) {
-            messageDao.clear(streamName, topicName)
-            messageDao.saveMessages(response.messages.map { it.toMessageEntity(streamName, topicName) })
-            return LoadResult.Page(mapMessages(response.messages), prevKey, nextKey, 0, 0)
-        }
+        try {
+            val response = zulipApi.getMessages(
+                pageSize, 0, lastId.toString(), "[\n" +
+                        "    {\n" +
+                        "        \"operator\": \"stream\",\n" +
+                        "        \"operand\": \"$streamName\"\n" +
+                        "    },\n" +
+                        "    {\n" +
+                        "        \"operator\": \"topic\",\n" +
+                        "        \"operand\": \"$topicName\"\n" +
+                        "    }\n" +
+                        "]"
+            )
+            val prevKey = if (response.messages.size < 20) null else page + 1
+            val nextKey = if (page == 1) null else page - 1
+            lastId = response.messages.firstOrNull()?.id?.toLong() ?: 0
+            if (page == 1) {
+                messageDao.clear(streamName, topicName)
+                messageDao.saveMessages(response.messages.map {
+                    it.toMessageEntity(
+                        streamName,
+                        topicName
+                    )
+                })
+                return LoadResult.Page(mapMessages(response.messages), prevKey, nextKey, 0, 0)
+            }
 
-        return LoadResult.Page(mapMessages(response.messages), prevKey, nextKey)
+            return LoadResult.Page(mapMessages(response.messages), prevKey, nextKey)
+        } catch (e: Exception) {
+            return LoadResult.Error<Int, DelegateItem>(e)
+        }
     }
 
     private fun mapMessages(messages: List<Message>): List<DelegateItem> {
@@ -158,7 +164,6 @@ class MessagePagingSource @AssistedInject constructor(
             }
         }
         // _lastDate = lastDate
-        Log.e("AAAA", messageItems.size.toString())
         return messageItems
     }
 

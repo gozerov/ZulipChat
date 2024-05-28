@@ -28,10 +28,7 @@ sealed interface ChatCommand {
         val emojiName: String
     ) : ChatCommand
 
-    data class GetEventsFromQueue(
-        val queueId: String,
-        val lastId: Int
-    ) : ChatCommand
+    class GetEventsFromQueue : ChatCommand
 
     data object Exit : ChatCommand
 

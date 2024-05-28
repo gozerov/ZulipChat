@@ -10,7 +10,7 @@ sealed interface ChatEvent {
 
     sealed interface UI : ChatEvent {
 
-        class Init(
+        data class Init(
             val stream: String,
             val topic: String,
             val fromCache: Boolean = true
@@ -56,7 +56,7 @@ sealed interface ChatEvent {
         data class LoadChatSuccess(
             val items: Flow<PagingData<DelegateItem>>,
             val fromCache: Boolean,
-            val positionToScroll: Int? = null
+            val isFirstPage: Boolean
         ) : Internal
 
         object LoadChatError : Internal

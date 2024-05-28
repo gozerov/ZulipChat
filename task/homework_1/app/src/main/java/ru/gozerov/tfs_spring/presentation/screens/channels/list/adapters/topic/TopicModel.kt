@@ -6,6 +6,5 @@ data class TopicModel(
     val id: Int,
     val channelId: Int,
     val color: Color,
-    val title: String,
-    val messageCount: Int
+    val title: String
 )

@@ -14,6 +14,11 @@ sealed class ToolbarState {
         val title: String
     ) : ToolbarState()
 
+
+    class SearchWithText(
+        val text: String
+    ) : ToolbarState()
+
     class NavUpWithTitle(
         @ColorRes val backgroundColor: Int,
         val title: String,

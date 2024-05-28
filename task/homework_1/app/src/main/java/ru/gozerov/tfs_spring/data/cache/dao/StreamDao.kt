@@ -18,4 +18,7 @@ interface StreamDao {
     @Query("SELECT * FROM stream WHERE is_favorite = 1")
     suspend fun getSubscribedStreams(): List<StreamEntity>
 
+    @Query("SELECT * FROM stream WHERE id=:id")
+    suspend fun getStreamById(id: Int): StreamEntity
+
 }

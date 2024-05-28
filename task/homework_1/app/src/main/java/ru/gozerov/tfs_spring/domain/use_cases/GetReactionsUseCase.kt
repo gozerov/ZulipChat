@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 class GetReactionsUseCase @Inject constructor() {
 
-    suspend operator fun invoke() = withContext(Dispatchers.IO) {
+    suspend operator fun invoke(): List<Reaction> = withContext(Dispatchers.IO) {
         emojiSetNCU.map {
             Reaction(it.name, it.getCodeString(), 0, false)
         }

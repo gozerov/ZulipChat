@@ -4,6 +4,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import ru.gozerov.tfs_spring.R
 import ru.gozerov.tfs_spring.core.AdapterDelegate
 import ru.gozerov.tfs_spring.core.DelegateItem
 import ru.gozerov.tfs_spring.core.views.MessageCardLayout
@@ -54,9 +57,11 @@ class UserMessageDelegate(
                 tag = data
                 username = data.author
                 message = data.message
-                /*   imageView.load(data.avatarUrl) {
-                       transformations(CircleCropTransformation())
-                   }*/
+                Glide.with(context)
+                    .load(data.avatarUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .circleCrop()
+                    .into(imageView)
                 addReaction(data.reactions)
             }
         }

@@ -1,6 +1,5 @@
 package ru.gozerov.tfs_spring.data.repositories
 
-import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import ru.gozerov.tfs_spring.data.cache.dao.StreamDao
@@ -11,10 +10,10 @@ import ru.gozerov.tfs_spring.data.cache.entities.toTopic
 import ru.gozerov.tfs_spring.data.cache.entities.toTopicEntity
 import ru.gozerov.tfs_spring.data.remote.api.ZulipApi
 import ru.gozerov.tfs_spring.data.remote.api.ZulipLongPollingApi
-import ru.gozerov.tfs_spring.data.remote.api.models.FullStream
 import ru.gozerov.tfs_spring.data.remote.api.models.Message
 import ru.gozerov.tfs_spring.data.remote.api.models.RegisterEventQueueResponse
-import ru.gozerov.tfs_spring.data.remote.api.models.User
+import ru.gozerov.tfs_spring.data.remote.api.models.Stream
+import ru.gozerov.tfs_spring.data.remote.api.models.StreamTopic
 import ru.gozerov.tfs_spring.data.remote.api.models.ZulipEvent
 import ru.gozerov.tfs_spring.domain.repositories.ZulipRepository
 import javax.inject.Inject
@@ -26,64 +25,71 @@ class ZulipRepositoryImpl @Inject constructor(
     private val topicDao: TopicDao
 ) : ZulipRepository {
 
-    private val categories = listOf("Subscribed", "All streams")
+    private var searchedStreams = mapOf<String, List<Stream>>()
 
-    override suspend fun getUsers(): List<User> {
-        return zulipApi.getUsers().members
-    }
+    private val expandedStreamIds = listOf(mutableListOf<Int>(), mutableListOf())
 
-    override suspend fun getOwnUser(): User {
-        return zulipApi.getOwnUser()
-    }
+    private var eventQueueId = ""
+    private var lastEventId = -1
 
-    override suspend fun getUserById(userId: Int): User {
-        return zulipApi.getUserById(userId).user
-    }
-
-    override suspend fun getStreams(): Flow<Map<String, List<FullStream>>> = flow {
-        val cacheItems = mutableMapOf<String, List<FullStream>>()
+    override suspend fun getStreams(): Flow<Map<String, List<Stream>>> = flow {
+        val cacheItems = mutableMapOf<String, List<Stream>>()
 
         val cacheSubscribedStreams = streamDao.getSubscribedStreams().map { stream ->
-            FullStream(
-                stream.toStream(),
-                topicDao.getTopics(stream.id).map { entity -> entity.toTopic() }
-            )
+            stream.toStream()
         }
-        cacheItems[categories[0]] = cacheSubscribedStreams
+        cacheItems[CATEGORY_SUBSCRIBED] = cacheSubscribedStreams
 
-        val cacheStreams = streamDao.getStreams().map { stream ->
-            FullStream(
-                stream.toStream(),
-                topicDao.getTopics(stream.id).map { entity -> entity.toTopic() }
-            )
-        }
-        cacheItems[categories[1]] = cacheStreams
+        val cacheStreams = streamDao.getStreams().map { stream -> stream.toStream() }
+        cacheItems[CATEGORY_ALL] = cacheStreams
 
+        searchedStreams = cacheItems
         emit(cacheItems)
 
         val remoteStreams = zulipApi.getAllStreams().streams
         streamDao.saveStreams(remoteStreams.map { it.toStreamEntity() })
-        val remoteMappedStreams = remoteStreams.map { stream ->
-            val topics = zulipApi.getStreamTopics(stream.stream_id).topics
-            topicDao.clear(stream.stream_id)
-            topicDao.saveTopics(topics.map { it.toTopicEntity(stream.stream_id) })
-            FullStream(stream, topics)
-        }
+
         val remoteSubscribedStreams = zulipApi.getSubscribedStreams().subscriptions
         streamDao.saveStreams(remoteSubscribedStreams.map { it.toStreamEntity(isFavorite = true) })
-        val remoteMappedSubscribedStreams = remoteSubscribedStreams.map { stream ->
-            val topics = zulipApi.getStreamTopics(stream.stream_id).topics
-            topicDao.clear(stream.stream_id)
-            topicDao.saveTopics(topics.map { it.toTopicEntity(stream.stream_id) })
-            FullStream(stream, topics)
-        }
+
         emit(
             mapOf(
-                categories[0] to remoteMappedSubscribedStreams,
-                categories[1] to remoteMappedStreams
-            )
+                CATEGORY_SUBSCRIBED to remoteSubscribedStreams.sortedBy { it.stream_id },
+                CATEGORY_ALL to remoteStreams.sortedBy { it.stream_id }
+            ).apply {
+                searchedStreams = this
+            }
         )
+    }
 
+    override suspend fun getTopics(streamId: Int): List<StreamTopic> {
+        val cachedTopics = topicDao.getTopics(streamId).map { topicEntity -> topicEntity.toTopic() }
+        if (cachedTopics.isNotEmpty()) return cachedTopics
+
+        val remoteTopics = zulipApi.getStreamTopics(streamId).topics
+        topicDao.clear(streamId)
+        topicDao.saveTopics(remoteTopics.map { topic -> topic.toTopicEntity(streamId) })
+        return remoteTopics
+    }
+
+    override suspend fun clearSearch() {
+        val cacheItems = mutableMapOf<String, List<Stream>>()
+
+        val cacheSubscribedStreams = streamDao.getSubscribedStreams().map { stream ->
+            stream.toStream()
+        }
+        cacheItems[CATEGORY_SUBSCRIBED] = cacheSubscribedStreams
+
+        val cacheStreams = streamDao.getStreams().map { stream -> stream.toStream() }
+        cacheItems[CATEGORY_ALL] = cacheStreams
+
+        searchedStreams = cacheItems
+    }
+
+    override suspend fun loadNewTopics(streamId: Int) {
+        val remoteTopics = zulipApi.getStreamTopics(streamId).topics
+        topicDao.clear(streamId)
+        topicDao.saveTopics(remoteTopics.map { topic -> topic.toTopicEntity(streamId) })
     }
 
     override suspend fun getMessages(
@@ -96,7 +102,6 @@ class ZulipRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addReaction(messageId: Int, emojiName: String) {
-        Log.e("AAAA", "adding")
         zulipApi.addReaction(messageId, emojiName)
     }
 
@@ -114,15 +119,81 @@ class ZulipRepositoryImpl @Inject constructor(
     }
 
     override suspend fun registerEventQueue(narrow: String): RegisterEventQueueResponse {
-        return zulipLongPollingApi.registerEventQueue(narrow = narrow)
+        val response = zulipLongPollingApi.registerEventQueue(narrow = narrow)
+        eventQueueId = response.queue_id
+        lastEventId = response.last_event_id
+        return response
     }
 
-    override suspend fun getEvents(queueId: String, lastEventId: Int): List<ZulipEvent> {
-        return zulipLongPollingApi.getEvents(queueId, lastEventId).events
+    override suspend fun getEvents(): List<ZulipEvent> {
+        val response = zulipLongPollingApi.getEvents(eventQueueId, lastEventId).events
+        response.forEach { event ->
+            lastEventId = event.id
+        }
+        return response
     }
 
-    override suspend fun deleteEventQueue(queueId: String) {
-        zulipLongPollingApi.deleteEventQueue(queueId)
+    override suspend fun deleteEventQueue() {
+        zulipLongPollingApi.deleteEventQueue(eventQueueId)
+        lastEventId = -1
+        eventQueueId = ""
+    }
+
+    override suspend fun getExpandedStreams(position: Int): List<Int> {
+        return expandedStreamIds[position]
+    }
+
+    override suspend fun setStreamExpand(position: Int, streamId: Int, isExpanded: Boolean) {
+        if (!isExpanded) expandedStreamIds[position].add(streamId) else expandedStreamIds[position].removeIf { id -> id == streamId }
+    }
+
+    override suspend fun getCachedStreams(position: Int): Pair<String, List<Stream>> {
+        return when (position) {
+            POSITION_SUBSCRIBED -> CATEGORY_SUBSCRIBED to
+                    searchedStreams.getValue(CATEGORY_SUBSCRIBED)
+
+            POSITION_ALL -> CATEGORY_ALL to
+                    searchedStreams.getValue(CATEGORY_ALL)
+
+            else -> error("Unexpected stream category")
+        }
+    }
+
+    override suspend fun getStreamById(id: Int): Stream {
+        return streamDao.getStreamById(id).toStream()
+    }
+
+    override suspend fun searchStreams(query: String): Map<String, List<Stream>> {
+        val cacheSubscribedStreams = CATEGORY_SUBSCRIBED to streamDao.getSubscribedStreams().map { stream -> stream.toStream() }
+        val cacheAllStreams = CATEGORY_ALL to streamDao.getStreams().map { stream -> stream.toStream() }
+
+        return if (query.isBlank()) {
+            mapOf(cacheSubscribedStreams, cacheAllStreams).apply {
+                searchedStreams = this
+            }
+        } else {
+            val searchedSubscribedStreams = cacheSubscribedStreams.second.filter { stream ->
+                stream.name.lowercase().contains(query.lowercase())
+            }
+            val searchedAllStreams = cacheAllStreams.second.filter { stream ->
+                stream.name.lowercase().contains(query.lowercase())
+            }
+            mapOf(
+                cacheSubscribedStreams.first to searchedSubscribedStreams,
+                cacheAllStreams.first to searchedAllStreams
+            ).apply {
+                searchedStreams = this
+            }
+        }
+    }
+
+    companion object {
+
+        const val POSITION_SUBSCRIBED = 0
+        const val POSITION_ALL = 1
+        const val CATEGORY_SUBSCRIBED = "Subscribed"
+        const val CATEGORY_ALL = "All streams"
+
     }
 
 }

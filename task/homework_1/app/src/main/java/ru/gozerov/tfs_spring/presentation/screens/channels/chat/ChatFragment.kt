@@ -2,7 +2,8 @@ package ru.gozerov.tfs_spring.presentation.screens.channels.chat
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +20,6 @@ import ru.gozerov.tfs_spring.core.utils.VerticalMarginItemDecoration
 import ru.gozerov.tfs_spring.databinding.FragmentChatBinding
 import ru.gozerov.tfs_spring.di.application.appComponent
 import ru.gozerov.tfs_spring.di.features.channels.chat.DaggerChatComponent
-import ru.gozerov.tfs_spring.domain.stubs.ChannelsStub
 import ru.gozerov.tfs_spring.presentation.activity.ToolbarState
 import ru.gozerov.tfs_spring.presentation.activity.updateToolbar
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.MainChatAdapter
@@ -67,6 +67,8 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>() {
         updateToolbar(ToolbarState.NavUpWithTitle(R.color.teal_400, args.channel))
 
         binding = FragmentChatBinding.inflate(inflater, container, false)
+
+        binding.txtTopic.text = getString(R.string.topic_is, args.topic)
 
         binding.messageInputField.addTextChangedListener { editable ->
             val imgRes = if (editable?.toString().isNullOrEmpty())
@@ -132,35 +134,35 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>() {
         binding.messageList.addItemDecoration(VerticalMarginItemDecoration())
         val layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
         layoutManager.stackFromEnd = true
+
+        binding.messageList.setHasFixedSize(true)
         binding.messageList.layoutManager = layoutManager
         binding.messageList.adapter = adapter
-        binding.messageList.setHasFixedSize(true)
     }
 
     override fun render(state: ChatState) {
         viewLifecycleOwner.lifecycleScope.launch {
-            state.flowItems?.cachedIn(this)?.collectLatest {
+            state.flowItems?.cachedIn(this)?.collectLatest { pagingData ->
                 if (state.fromCache)
-                    store.accept(ChatEvent.UI.Init(args.channel, args.topic, false))
-                store.accept(ChatEvent.UI.SaveMessages(it))
-                adapter.submitData(it)
-            }
-            state.positionToScroll?.run {
-                binding.messageList.postDelayed({
-                    binding.messageList.scrollToPosition(
-                        binding.messageList.adapter?.itemCount?.minus(
-                            1
-                        ) ?: 0
-                    )
-                }, 50)
+                    store.accept(ChatEvent.UI.LoadMessages(args.channel, args.topic, false))
+
+                if (state.isFirstPage && adapter.itemCount > 0) {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        binding.messageList.smoothScrollToPosition(adapter.itemCount - 1)
+                    }, 1000)
+                }
+                store.accept(ChatEvent.UI.SaveMessages(pagingData))
+                adapter.submitData(pagingData)
             }
         }
     }
 
     override fun handleEffect(effect: ChatEffect) = when (effect) {
-        is ChatEffect.ShowError -> Snackbar
-            .make(requireView(), "Error", Snackbar.LENGTH_SHORT)
-            .show()
+        is ChatEffect.ShowError -> {
+            Snackbar
+                .make(requireView(), "Error", Snackbar.LENGTH_SHORT)
+                .show()
+        }
     }
 
     override fun onDestroy() {

@@ -12,7 +12,7 @@ interface ZulipLongPollingApi {
 
     @POST("register")
     suspend fun registerEventQueue(
-        @Query("event_types") eventTypes: String = JSONArray(listOf("message")).toString(),
+        @Query("event_types") eventTypes: String = "[\"message\"]",
         @Query("narrow") narrow: String
     ): RegisterEventQueueResponse
 

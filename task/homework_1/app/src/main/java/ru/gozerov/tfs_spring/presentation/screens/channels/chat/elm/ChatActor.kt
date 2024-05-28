@@ -1,19 +1,14 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm
 
-import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
 import ru.gozerov.tfs_spring.core.DelegateItem
 import ru.gozerov.tfs_spring.core.runCatchingNonCancellation
-import ru.gozerov.tfs_spring.data.cache.dao.MessageDao
 import ru.gozerov.tfs_spring.data.remote.paging.MessagePagingSource
-import ru.gozerov.tfs_spring.domain.stubs.ChannelsStub
 import ru.gozerov.tfs_spring.domain.use_cases.AddReactionUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.DeleteEventQueueUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.GetEventsFromQueueUseCase
@@ -26,7 +21,6 @@ import vivid.money.elmslie.coroutines.Actor
 import javax.inject.Inject
 
 class ChatActor @Inject constructor(
-    private val messageDao: MessageDao,
     private val messagePagingSourceFactory: MessagePagingSource.Factory,
     private val sendMessageUseCase: SendMessageUseCase,
     private val registerEventQueueUseCase: RegisterEventQueueUseCase,
@@ -38,14 +32,17 @@ class ChatActor @Inject constructor(
 
     private var pagingSource: MessagePagingSource? = null
 
-    @OptIn(ExperimentalPagingApi::class)
     override fun execute(command: ChatCommand): Flow<ChatEvent> =
         flow {
 
             when (command) {
                 is ChatCommand.LoadChat -> {
-                    pagingSource = messagePagingSourceFactory.create(command.stream, command.topic, command.fromCache)
                     runCatchingNonCancellation {
+                        pagingSource = messagePagingSourceFactory.create(
+                            command.stream,
+                            command.topic,
+                            command.fromCache
+                        )
                         val pager = Pager<Int, DelegateItem>(
                             config = PagingConfig(
                                 pageSize = 25,
@@ -56,45 +53,35 @@ class ChatActor @Inject constructor(
                         }
                         return@runCatchingNonCancellation pager.flow
                     }
-                        .fold(
-                            onSuccess = { flow ->
-                                emit(ChatEvent.Internal.LoadChatSuccess(flow, command.fromCache))
-                            },
-                            onFailure = {
-                                emit(ChatEvent.Internal.LoadChatError)
-                            }
-                        )
-
+                        .onSuccess { flow ->
+                            emit(
+                                ChatEvent.Internal.LoadChatSuccess(
+                                    flow,
+                                    command.fromCache,
+                                    true
+                                )
+                            )
+                        }
+                        .onFailure {
+                            emit(ChatEvent.Internal.LoadChatError)
+                        }
                 }
 
                 is ChatCommand.RegisterEventQueue -> {
                     runCatchingNonCancellation {
                         registerEventQueueUseCase.invoke(command.topic)
                     }
-                        .fold(
-                            onSuccess = {
-                                emit(
-                                    ChatEvent.Internal.RegisteredEventQueue(
-                                        it.queue_id,
-                                        it.last_event_id
-                                    )
+                        .onSuccess { event ->
+                            emit(
+                                ChatEvent.Internal.RegisteredEventQueue(
+                                    event.queue_id,
+                                    event.last_event_id
                                 )
-                                coroutineScope {
-                                    launch {
-                                        val events =
-                                            getEventsFromQueueUseCase.invoke(
-                                                it.queue_id,
-                                                it.last_event_id
-                                            )
-                                        emit(ChatEvent.Internal.NewEventsFromQueue(events))
-                                    }
-                                }
-
-                            },
-                            onFailure = {
-                                emit(ChatEvent.Internal.LoadChatError)
-                            }
-                        )
+                            )
+                        }
+                        .onFailure {
+                            emit(ChatEvent.Internal.LoadChatError)
+                        }
                 }
 
                 is ChatCommand.SendMessage -> {
@@ -114,6 +101,9 @@ class ChatActor @Inject constructor(
                     runCatchingNonCancellation {
                         addReactionUseCase.invoke(command.messageId, command.emojiName)
                     }
+                        .onFailure {
+                            emit(ChatEvent.Internal.LoadChatError)
+                        }
                 }
 
                 is ChatCommand.RemoveReaction -> {
@@ -123,21 +113,26 @@ class ChatActor @Inject constructor(
                             command.emojiName
                         )
                     }
+                        .onFailure {
+                            emit(ChatEvent.Internal.LoadChatError)
+                        }
                 }
 
                 is ChatCommand.GetEventsFromQueue -> {
                     runCatchingNonCancellation {
-                        getEventsFromQueueUseCase.invoke(command.queueId, command.lastId)
+                        getEventsFromQueueUseCase.invoke()
                     }
-                        .map {
-                            emit(ChatEvent.Internal.NewEventsFromQueue(it))
+                        .onSuccess { events ->
+                            emit(ChatEvent.Internal.NewEventsFromQueue(events))
                         }
-                        .onFailure { }
+                        .onFailure {
+                            emit(ChatEvent.Internal.LoadChatError)
+                        }
                 }
 
                 is ChatCommand.Exit -> {
                     runCatchingNonCancellation {
-                        deleteEventQueueUseCase.invoke(ru.gozerov.tfs_spring.data.remote.api.EventQueueData.queueId)
+                        deleteEventQueueUseCase.invoke()
                     }
                         .onFailure {
                             emit(ChatEvent.Internal.LoadChatError)
