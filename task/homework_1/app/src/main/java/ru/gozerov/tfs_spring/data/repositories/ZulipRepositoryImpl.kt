@@ -8,7 +8,6 @@ import ru.gozerov.tfs_spring.data.cache.entities.toStream
 import ru.gozerov.tfs_spring.data.cache.entities.toStreamEntity
 import ru.gozerov.tfs_spring.data.cache.entities.toTopic
 import ru.gozerov.tfs_spring.data.cache.entities.toTopicEntity
-import ru.gozerov.tfs_spring.data.cache.storage.AppStorage
 import ru.gozerov.tfs_spring.data.remote.api.ZulipApi
 import ru.gozerov.tfs_spring.data.remote.api.ZulipLongPollingApi
 import ru.gozerov.tfs_spring.data.remote.api.models.Message
@@ -45,6 +44,7 @@ class ZulipRepositoryImpl @Inject constructor(
         cacheItems[CATEGORY_ALL] = cacheStreams
 
         searchedStreams = cacheItems
+
         emit(cacheItems)
 
         val remoteStreams = zulipApi.getAllStreams().streams
@@ -165,8 +165,10 @@ class ZulipRepositoryImpl @Inject constructor(
     }
 
     override suspend fun searchStreams(query: String): Map<String, List<Stream>> {
-        val cacheSubscribedStreams = CATEGORY_SUBSCRIBED to streamDao.getSubscribedStreams().map { stream -> stream.toStream() }
-        val cacheAllStreams = CATEGORY_ALL to streamDao.getStreams().map { stream -> stream.toStream() }
+        val cacheSubscribedStreams = CATEGORY_SUBSCRIBED to streamDao.getSubscribedStreams()
+            .map { stream -> stream.toStream() }
+        val cacheAllStreams =
+            CATEGORY_ALL to streamDao.getStreams().map { stream -> stream.toStream() }
 
         return if (query.isBlank()) {
             mapOf(cacheSubscribedStreams, cacheAllStreams).apply {

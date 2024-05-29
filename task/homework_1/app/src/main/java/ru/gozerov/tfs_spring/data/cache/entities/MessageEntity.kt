@@ -11,9 +11,9 @@ data class MessageEntity(
     @ColumnInfo(name = "stream_name") val streamName: String,
     @ColumnInfo(name = "topic_name") val topicName: String,
     val timestamp: Long,
-    val avatar_url: String?,
-    val sender_id: Int,
-    val sender_full_name: String,
-    val is_me_message: Boolean,
+    @ColumnInfo(name = "avatar_url") val avatarUrl: String?,
+    @ColumnInfo(name = "sender_id") val senderId: Int,
+    @ColumnInfo(name = "sender_full_name") val senderName: String,
+    @ColumnInfo(name = "is_me_message") val isMeMessage: Boolean,
     val content: String
 )

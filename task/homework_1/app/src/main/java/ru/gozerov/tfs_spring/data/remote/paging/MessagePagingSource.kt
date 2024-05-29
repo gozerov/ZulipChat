@@ -172,7 +172,7 @@ class MessagePagingSource @AssistedInject constructor(
                 )
             }
         }
-        // _lastDate = lastDate
+        _lastDate = lastDate
         return messageItems
     }
 

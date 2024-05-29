@@ -27,10 +27,10 @@ fun Message.toMessageEntity(stream: String, topic: String) = MessageEntity(
 fun MessageEntity.toMessage(reactions: List<ZulipReaction>) = Message(
     id,
     timestamp,
-    avatar_url,
-    sender_id,
-    sender_full_name,
-    is_me_message,
+    avatarUrl,
+    senderId,
+    senderName,
+    isMeMessage,
     content,
     reactions
 )

@@ -1,6 +1,5 @@
 package ru.gozerov.tfs_spring.data.remote.api
 
-import org.json.JSONArray
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST

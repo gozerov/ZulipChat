@@ -111,20 +111,22 @@ class ChannelListFragment : ElmFragment<ChannelListEvent, ChannelListEffect, Cha
         state.channels?.run {
             if (binding.categoryTabs.tabCount == 0)
                 configureTabsMediator(keys.toList())
-            binding.shimmerLayout.stopShimmer()
-            binding.shimmerLayout.visibility = View.GONE
-            binding.channelsViewPager.visibility = View.VISIBLE
-            channelPagerAdapter.data = values.toList()
+            if (state.channels.filter { entry -> entry.value.isNotEmpty() }.isNotEmpty()) {
+                binding.shimmerLayout.stopShimmer()
+                binding.shimmerLayout.visibility = View.GONE
+                binding.channelsViewPager.visibility = View.VISIBLE
+                channelPagerAdapter.data = values.toList()
 
-            val recyclerView =
-                binding.channelsViewPager.children.firstOrNull { it is RecyclerView } as? RecyclerView
-            val childRecyclerView =
-                recyclerView?.children?.firstOrNull { it is RecyclerView } as? RecyclerView
+                val recyclerView =
+                    binding.channelsViewPager.children.firstOrNull { it is RecyclerView } as? RecyclerView
+                val childRecyclerView =
+                    recyclerView?.children?.firstOrNull { it is RecyclerView } as? RecyclerView
 
-            childRecyclerView?.layoutManager?.onRestoreInstanceState(state.scrollState)
+                childRecyclerView?.layoutManager?.onRestoreInstanceState(state.scrollState)
 
-            if (!state.isNavigating && state.query.isEmpty())
-                updateToolbar(ToolbarState.Search(getString(R.string.search_and), true))
+                if (!state.isNavigating && state.query.isEmpty())
+                    updateToolbar(ToolbarState.Search(getString(R.string.search_and), true))
+            }
 
         }
     }
