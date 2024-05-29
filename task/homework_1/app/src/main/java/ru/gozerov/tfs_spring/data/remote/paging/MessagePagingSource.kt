@@ -11,10 +11,10 @@ import ru.gozerov.tfs_spring.core.utils.mapMonth
 import ru.gozerov.tfs_spring.data.cache.dao.MessageDao
 import ru.gozerov.tfs_spring.data.cache.entities.toMessage
 import ru.gozerov.tfs_spring.data.cache.entities.toMessageEntity
+import ru.gozerov.tfs_spring.data.cache.storage.AppStorage
 import ru.gozerov.tfs_spring.data.remote.api.ZulipApi
 import ru.gozerov.tfs_spring.data.remote.api.models.Message
 import ru.gozerov.tfs_spring.data.remote.api.models.MutableReaction
-import ru.gozerov.tfs_spring.domain.stubs.UserStub
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.date.DateDelegateItem
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.date.DateModel
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.message.Reaction
@@ -28,6 +28,7 @@ import java.util.TimeZone
 class MessagePagingSource @AssistedInject constructor(
     private val zulipApi: ZulipApi,
     private val messageDao: MessageDao,
+    private val appStorage: AppStorage,
     @Assisted("stream") private val streamName: String,
     @Assisted("topic") private val topicName: String,
     @Assisted("fromCache") private val fromCache: Boolean
@@ -60,6 +61,13 @@ class MessagePagingSource @AssistedInject constructor(
             }
         }
         try {
+            val id = appStorage.getUserId()
+
+            if (id == -1) {
+                val userId = zulipApi.getOwnUser().user_id
+                appStorage.saveUserId(userId)
+            }
+
             val response = zulipApi.getMessages(
                 pageSize, 0, lastId.toString(), "[\n" +
                         "    {\n" +
@@ -93,6 +101,7 @@ class MessagePagingSource @AssistedInject constructor(
     }
 
     private fun mapMessages(messages: List<Message>): List<DelegateItem> {
+        val userId = appStorage.getUserId()
         var dateCount = 0
         var lastDate = ""
         val calendar = Calendar.getInstance()
@@ -105,7 +114,7 @@ class MessagePagingSource @AssistedInject constructor(
                 val listR = reactionCodes[reaction.emoji_name]
                 listR?.let {
                     it.count++
-                    if (reaction.user_id == UserStub.CURRENT_USER_ID)
+                    if (reaction.user_id == userId)
                         it.isSelected = true
                 } ?: reactionCodes.put(
                     reaction.emoji_name,
@@ -114,7 +123,7 @@ class MessagePagingSource @AssistedInject constructor(
                         reaction.reaction_type,
                         reaction.emoji_code,
                         1,
-                        reaction.user_id == UserStub.CURRENT_USER_ID
+                        reaction.user_id == userId
                     )
                 )
             }
@@ -140,7 +149,7 @@ class MessagePagingSource @AssistedInject constructor(
                     it.isSelected
                 )
             }
-            if (message.sender_id == UserStub.CURRENT_USER_ID) {
+            if (message.sender_id == userId) {
                 messageItems.add(
                     OwnMessageDelegateItem(
                         message.id,

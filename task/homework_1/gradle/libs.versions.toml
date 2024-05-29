@@ -27,6 +27,7 @@ kotest = "5.8.1"
 wiremock = "2.27.2"
 fragmentTesting = "1.7.1"
 hamcrest = "2.2"
+glide = "4.16.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -68,6 +69,7 @@ wiremock = { group = "com.github.tomakehurst", name = "wiremock-standalone", ver
 androidx-espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espressoCore" }
 androidx-fragment-testing = { group = "androidx.fragment", name = "fragment-testing", version.ref = "fragmentTesting" }
 hamcrest = { group = "org.hamcrest", name = "hamcrest", version.ref = "hamcrest" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

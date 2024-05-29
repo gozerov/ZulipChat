@@ -6,6 +6,7 @@ import dagger.Component
 import ru.gozerov.tfs_spring.app.TFSApp
 import ru.gozerov.tfs_spring.data.cache.AppDatabase
 import ru.gozerov.tfs_spring.data.cache.dao.MessageDao
+import ru.gozerov.tfs_spring.data.cache.storage.AppStorage
 import ru.gozerov.tfs_spring.data.remote.api.ZulipApi
 import ru.gozerov.tfs_spring.data.remote.api.ZulipLongPollingApi
 import ru.gozerov.tfs_spring.domain.repositories.UsersRepository
@@ -20,6 +21,7 @@ interface AppComponent {
     val usersRepository: UsersRepository
     val zulipApi: ZulipApi
     val zulipLongPollingApi: ZulipLongPollingApi
+    val appStorage: AppStorage
 
     val appDatabase: AppDatabase
     val messageDao: MessageDao

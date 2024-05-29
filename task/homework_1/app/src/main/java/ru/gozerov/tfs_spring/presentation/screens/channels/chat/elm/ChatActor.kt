@@ -12,6 +12,7 @@ import ru.gozerov.tfs_spring.data.remote.paging.MessagePagingSource
 import ru.gozerov.tfs_spring.domain.use_cases.AddReactionUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.DeleteEventQueueUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.GetEventsFromQueueUseCase
+import ru.gozerov.tfs_spring.domain.use_cases.GetOwnUserIdUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.RegisterEventQueueUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.RemoveReactionUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.SendMessageUseCase
@@ -27,7 +28,8 @@ class ChatActor @Inject constructor(
     private val addReactionUseCase: AddReactionUseCase,
     private val removeReactionUseCase: RemoveReactionUseCase,
     private val getEventsFromQueueUseCase: GetEventsFromQueueUseCase,
-    private val deleteEventQueueUseCase: DeleteEventQueueUseCase
+    private val deleteEventQueueUseCase: DeleteEventQueueUseCase,
+    private val getOwnUserIdUseCase: GetOwnUserIdUseCase
 ) : Actor<ChatCommand, ChatEvent> {
 
     private var pagingSource: MessagePagingSource? = null
@@ -123,7 +125,8 @@ class ChatActor @Inject constructor(
                         getEventsFromQueueUseCase.invoke()
                     }
                         .onSuccess { events ->
-                            emit(ChatEvent.Internal.NewEventsFromQueue(events))
+                            val id = getOwnUserIdUseCase.invoke()
+                            emit(ChatEvent.Internal.NewEventsFromQueue(events, id))
                         }
                         .onFailure {
                             emit(ChatEvent.Internal.LoadChatError)

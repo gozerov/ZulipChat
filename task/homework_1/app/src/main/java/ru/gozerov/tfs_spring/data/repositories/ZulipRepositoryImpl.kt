@@ -8,6 +8,7 @@ import ru.gozerov.tfs_spring.data.cache.entities.toStream
 import ru.gozerov.tfs_spring.data.cache.entities.toStreamEntity
 import ru.gozerov.tfs_spring.data.cache.entities.toTopic
 import ru.gozerov.tfs_spring.data.cache.entities.toTopicEntity
+import ru.gozerov.tfs_spring.data.cache.storage.AppStorage
 import ru.gozerov.tfs_spring.data.remote.api.ZulipApi
 import ru.gozerov.tfs_spring.data.remote.api.ZulipLongPollingApi
 import ru.gozerov.tfs_spring.data.remote.api.models.Message

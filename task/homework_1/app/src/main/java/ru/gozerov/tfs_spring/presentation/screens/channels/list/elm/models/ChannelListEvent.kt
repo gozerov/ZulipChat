@@ -1,5 +1,6 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.list.elm.models
 
+import android.os.Parcelable
 import ru.gozerov.tfs_spring.core.DelegateItem
 import ru.gozerov.tfs_spring.domain.models.ExpandTopicResult
 import ru.gozerov.tfs_spring.presentation.screens.channels.list.adapters.channel.ChannelModel
@@ -13,7 +14,7 @@ sealed interface ChannelListEvent {
 
         class ExpandItems(
             val channel: ChannelModel,
-            val scrollPosition: Int,
+            val scrollState: Parcelable?,
             val categoryInd: Int
         ) : UI
 
@@ -44,7 +45,8 @@ sealed interface ChannelListEvent {
         ) : Internal
 
         class ExpandedChannels(
-            val result: ExpandTopicResult
+            val result: ExpandTopicResult,
+            val scrollState: Parcelable?
         ) : Internal
 
         object ErrorLoadedChannels : Internal

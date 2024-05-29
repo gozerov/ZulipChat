@@ -2,15 +2,16 @@ package ru.gozerov.tfs_spring.presentation.screens.channels.list
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.children
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import ru.gozerov.tfs_spring.R
@@ -64,12 +65,15 @@ class ChannelListFragment : ElmFragment<ChannelListEvent, ChannelListEffect, Cha
     ): View {
         binding = FragmentChannelListBinding.inflate(inflater, container, false)
         val channelDelegate = ChannelDelegate { channel ->
-            val position = binding.channelsViewPager.computeScroll()
-            Log.e("AAA", position.toString())
+
+            val recyclerView =
+                binding.channelsViewPager.children.firstOrNull { it is RecyclerView } as? RecyclerView
+            val childRecyclerView =
+                recyclerView?.children?.firstOrNull { it is RecyclerView } as? RecyclerView
             store.accept(
                 ChannelListEvent.UI.ExpandItems(
                     channel,
-                    binding.channelsViewPager.scrollState,
+                    childRecyclerView?.layoutManager?.onSaveInstanceState(),
                     binding.categoryTabs.selectedTabPosition
                 )
             )
@@ -105,13 +109,22 @@ class ChannelListFragment : ElmFragment<ChannelListEvent, ChannelListEffect, Cha
 
     override fun render(state: ChannelListState) {
         state.channels?.run {
+            if (binding.categoryTabs.tabCount == 0)
+                configureTabsMediator(keys.toList())
             binding.shimmerLayout.stopShimmer()
             binding.shimmerLayout.visibility = View.GONE
             binding.channelsViewPager.visibility = View.VISIBLE
-            configureTabsMediator(keys.toList())
             channelPagerAdapter.data = values.toList()
+
+            val recyclerView =
+                binding.channelsViewPager.children.firstOrNull { it is RecyclerView } as? RecyclerView
+            val childRecyclerView =
+                recyclerView?.children?.firstOrNull { it is RecyclerView } as? RecyclerView
+
+            childRecyclerView?.layoutManager?.onRestoreInstanceState(state.scrollState)
+
             if (!state.isNavigating && state.query.isEmpty())
-                updateToolbar(ToolbarState.Search(getString(R.string.search_and)))
+                updateToolbar(ToolbarState.Search(getString(R.string.search_and), true))
 
         }
     }

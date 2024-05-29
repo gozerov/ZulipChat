@@ -11,7 +11,8 @@ sealed class ToolbarState {
     ) : ToolbarState()
 
     class Search(
-        val title: String
+        val title: String,
+        val isFocused: Boolean = false
     ) : ToolbarState()
 
 

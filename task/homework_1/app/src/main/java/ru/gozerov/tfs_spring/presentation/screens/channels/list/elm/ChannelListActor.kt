@@ -55,7 +55,12 @@ class ChannelListActor @Inject constructor(
                 }
                     .fold(
                         onSuccess = { result ->
-                            emit(ChannelListEvent.Internal.ExpandedChannels(result))
+                            emit(
+                                ChannelListEvent.Internal.ExpandedChannels(
+                                    result,
+                                    command.scrollState
+                                )
+                            )
                             loadNewTopicsUseCase.invoke(command.channel.id)
                         },
                         onFailure = {

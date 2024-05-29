@@ -1,6 +1,5 @@
 package ru.gozerov.tfs_spring.presentation.screens.channels.chat.elm
 
-import android.util.Log
 import androidx.paging.insertFooterItem
 import androidx.paging.map
 import kotlinx.coroutines.flow.flowOf
@@ -10,7 +9,6 @@ import ru.gozerov.tfs_spring.core.utils.mapMonth
 import ru.gozerov.tfs_spring.data.remote.api.models.Message
 import ru.gozerov.tfs_spring.data.remote.api.models.MutableReaction
 import ru.gozerov.tfs_spring.data.remote.api.models.ZulipEvent
-import ru.gozerov.tfs_spring.domain.stubs.UserStub
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.date.DateDelegateItem
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.date.DateModel
 import ru.gozerov.tfs_spring.presentation.screens.channels.chat.adapters.message.Reaction
@@ -92,7 +90,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
         }
 
         is ChatEvent.Internal.NewEventsFromQueue -> {
-            obtainNewMessages(event.items)
+            obtainNewMessages(event.items, event.userId)
         }
 
         is ChatEvent.UI.Exit -> {
@@ -209,7 +207,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
     }
 
 
-    private fun Result.obtainNewMessages(items: List<ZulipEvent>) {
+    private fun Result.obtainNewMessages(items: List<ZulipEvent>, userId: Int) {
         val messages = mutableListOf<Message>()
 
         items.forEach {
@@ -235,7 +233,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
                 val listR = reactionCodes[reaction.emoji_name]
                 listR?.let {
                     it.count++
-                    if (reaction.user_id == UserStub.CURRENT_USER_ID)
+                    if (reaction.user_id == userId)
                         it.isSelected = true
                 } ?: reactionCodes.put(
                     reaction.emoji_name,
@@ -244,7 +242,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
                         reaction.reaction_type,
                         reaction.emoji_code,
                         1,
-                        reaction.user_id == UserStub.CURRENT_USER_ID
+                        reaction.user_id == userId
                     )
                 )
             }
@@ -268,7 +266,7 @@ class ChatReducer : DslReducer<ChatEvent, ChatState, ChatEffect, ChatCommand>() 
                     it.isSelected
                 )
             }
-            if (message.sender_id == UserStub.CURRENT_USER_ID) {
+            if (message.sender_id == userId) {
                 messageItems.add(
                     OwnMessageDelegateItem(
                         message.id,

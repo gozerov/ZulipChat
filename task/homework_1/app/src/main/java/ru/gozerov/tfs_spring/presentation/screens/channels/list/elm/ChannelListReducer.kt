@@ -45,7 +45,8 @@ class ChannelListReducer @Inject constructor(
                         if (entry.key == event.result.category) {
                             event.result.items
                         } else entry.value
-                    }
+                    },
+                    scrollState = event.scrollState
                 )
             }
         }
@@ -67,7 +68,13 @@ class ChannelListReducer @Inject constructor(
         }
 
         is ChannelListEvent.UI.ExpandItems -> {
-            commands { +ChannelListCommand.ExpandItems(event.channel, event.categoryInd) }
+            commands {
+                +ChannelListCommand.ExpandItems(
+                    event.channel,
+                    event.categoryInd,
+                    event.scrollState
+                )
+            }
         }
 
         is ChannelListEvent.UI.Search -> {

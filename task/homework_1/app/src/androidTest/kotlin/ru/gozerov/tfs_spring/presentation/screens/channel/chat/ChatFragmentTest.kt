@@ -41,6 +41,7 @@ class ChatFragmentTest : TestCase() {
             withRegisteredEventQueue()
             withEvents()
             withDeleteQueueEvent()
+            withUsers()
         }
         appRule.activityScenarioRule.scenario.onActivity { activity ->
             val fragment = ChatFragment()
@@ -73,7 +74,7 @@ class ChatFragmentTest : TestCase() {
                         withMessageEvent()
                     }
                     appRule.wiremockRule.addMockServiceRequestListener { request, response ->
-                        if (response.bodyAsString[response.bodyAsString.indexOf("message") + 6] != 'n') {
+                        if (response.bodyAsString.contains("message")) {
                             appRule.wiremockRule.message {
                                 withEvents()
                             }

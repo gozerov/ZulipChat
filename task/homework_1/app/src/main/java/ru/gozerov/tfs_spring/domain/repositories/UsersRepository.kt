@@ -13,4 +13,6 @@ interface UsersRepository {
 
     suspend fun getUserById(userId: Int): UserContact
 
+    suspend fun getOwnUserId(): Int
+
 }

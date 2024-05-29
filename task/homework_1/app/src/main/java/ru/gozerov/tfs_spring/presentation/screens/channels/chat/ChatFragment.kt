@@ -149,7 +149,7 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>() {
                 if (state.isFirstPage && adapter.itemCount > 0) {
                     Handler(Looper.getMainLooper()).postDelayed({
                         binding.messageList.smoothScrollToPosition(adapter.itemCount - 1)
-                    }, 1000)
+                    }, 750)
                 }
                 store.accept(ChatEvent.UI.SaveMessages(pagingData))
                 adapter.submitData(pagingData)

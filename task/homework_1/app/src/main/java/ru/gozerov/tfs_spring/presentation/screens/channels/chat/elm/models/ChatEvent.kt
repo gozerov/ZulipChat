@@ -67,7 +67,8 @@ sealed interface ChatEvent {
         ) : Internal
 
         data class NewEventsFromQueue(
-            val items: List<ZulipEvent>
+            val items: List<ZulipEvent>,
+            val userId: Int
         ) : Internal
 
     }

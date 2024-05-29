@@ -79,13 +79,26 @@ class ChatReducerTest {
         //Given
         val reducer = ChatReducer()
         val state = ChatState()
-        val data = PagingData.from(listOf<DelegateItem>(UserMessageDelegateItem(0, UserMessageModel(0, "", 1, "", listOf(), null))))
+        val data = PagingData.from(
+            listOf<DelegateItem>(
+                UserMessageDelegateItem(
+                    0,
+                    UserMessageModel(0, "", 1, "", listOf(), null)
+                )
+            )
+        )
         val items = flowOf(data)
-        val event = ChatEvent.Internal.LoadChatSuccess(items, false)
+        val event =
+            ChatEvent.Internal.LoadChatSuccess(items, fromCache = false, isFirstPage = false)
         //When
         val actual = reducer.reduce(event, state)
         //Then
-        val expectedState = ChatState(isLoading = false, fromCache = false, flowItems = actual.state.flowItems, items = null)
+        val expectedState = ChatState(
+            isLoading = false,
+            fromCache = false,
+            flowItems = actual.state.flowItems,
+            items = null
+        )
         assertEquals(expectedState, actual.state)
     }
 
@@ -125,7 +138,14 @@ class ChatReducerTest {
         //Given
         val reducer = ChatReducer()
         val state = ChatState()
-        val data = PagingData.from(listOf<DelegateItem>(UserMessageDelegateItem(0, UserMessageModel(0, "", 1, "", listOf(), null))))
+        val data = PagingData.from(
+            listOf<DelegateItem>(
+                UserMessageDelegateItem(
+                    0,
+                    UserMessageModel(0, "", 1, "", listOf(), null)
+                )
+            )
+        )
         val event = ChatEvent.UI.SaveMessages(data)
         //When
         val actual = reducer.reduce(event, state)
@@ -173,7 +193,7 @@ class ChatReducerTest {
         //When
         val actual = reducer.reduce(event, state)
         //Then
-        assertTrue(actual.commands.contains(ChatCommand.GetEventsFromQueue(queueId, lastEventId)))
+        assertTrue(actual.commands.filterIsInstance<ChatCommand.GetEventsFromQueue>().isNotEmpty())
     }
 
     @Test

@@ -14,7 +14,7 @@ import ru.gozerov.tfs_spring.di.application.LongReadOkHttpClient
 import javax.inject.Singleton
 
 @Module
-class TestRemoteModule {
+interface TestRemoteModule {
 
     companion object {
 

@@ -101,8 +101,10 @@ class MainActivity : AppCompatActivity(), ToolbarHolder {
                 binding.searchField.post {
                     binding.searchEditText.hint = toolbarState.title
                     binding.searchEditText.editableText.clear()
-                    binding.searchField.clearFocus()
-                    binding.globalFragmentContainer.requestFocus()
+                    if (!toolbarState.isFocused) {
+                        binding.searchField.clearFocus()
+                        binding.globalFragmentContainer.requestFocus()
+                    }
                 }
                 binding.endActionButton.setOnClickListener {
                     hideKeyboard(binding.root)

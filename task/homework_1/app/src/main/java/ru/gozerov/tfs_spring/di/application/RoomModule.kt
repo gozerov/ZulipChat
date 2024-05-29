@@ -7,26 +7,30 @@ import ru.gozerov.tfs_spring.data.cache.AppDatabase
 import javax.inject.Singleton
 
 @Module
-class RoomModule {
+interface RoomModule {
 
-    @Singleton
-    @Provides
-    fun provideMessageDao(context: Context) = AppDatabase.getInstance(context).getMessageDao()
+    companion object {
 
-    @Singleton
-    @Provides
-    fun provideStreamDao(context: Context) = AppDatabase.getInstance(context).getStreamDao()
+        @Singleton
+        @Provides
+        fun provideMessageDao(context: Context) = AppDatabase.getInstance(context).getMessageDao()
 
-    @Singleton
-    @Provides
-    fun provideTopicDao(context: Context) = AppDatabase.getInstance(context).getTopicDao()
+        @Singleton
+        @Provides
+        fun provideStreamDao(context: Context) = AppDatabase.getInstance(context).getStreamDao()
 
-    @Singleton
-    @Provides
-    fun provideUsersDao(context: Context) = AppDatabase.getInstance(context).getUsersDao()
+        @Singleton
+        @Provides
+        fun provideTopicDao(context: Context) = AppDatabase.getInstance(context).getTopicDao()
 
-    @Singleton
-    @Provides
-    fun provideAppDatabase(context: Context) = AppDatabase.getInstance(context)
+        @Singleton
+        @Provides
+        fun provideUsersDao(context: Context) = AppDatabase.getInstance(context).getUsersDao()
+
+        @Singleton
+        @Provides
+        fun provideAppDatabase(context: Context) = AppDatabase.getInstance(context)
+
+    }
 
 }

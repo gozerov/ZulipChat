@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import ru.gozerov.tfs_spring.core.runCatchingNonCancellation
-import ru.gozerov.tfs_spring.domain.stubs.UserStub
 import ru.gozerov.tfs_spring.domain.use_cases.GetContactsUseCase
 import ru.gozerov.tfs_spring.domain.use_cases.SearchContactsByNameUseCase
 import ru.gozerov.tfs_spring.presentation.screens.contacts.list.elm.models.ContactListCommand
